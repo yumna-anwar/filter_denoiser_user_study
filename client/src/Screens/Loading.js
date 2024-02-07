@@ -6,7 +6,10 @@ import UserStudies from "./Admin.UserStudies";
 import Dashboard from "./Dashboard";
 import UserStudy from "./UserStudy";
 import UserConfig from "./UserConfig";
-import OTcalib from "./OTcalib";
+import VentConfig from "./VentConfig";
+import InlossConfig from "./InlossConfig";
+import FilterConfig from "./FilterConfig";
+import PinnaConfig from "./PinnaConfig";
 import HAcalib from "./HAcalib";
 import Login from "./Login";
 import Register from "./Register";
@@ -51,8 +54,11 @@ const Loading = () => {
             <>
               <Route exact path="/" element={<Dashboard />} />
               <Route exact path="/user-config" element={<UserConfig />} />
+              <Route exact path="/filter-config" element={<FilterConfig />} />
+              <Route exact path="/vent-config" element={<VentConfig />} />
+              <Route exact path="/inloss-config" element={<InlossConfig />} />
               <Route exact path="/user-study" element={<UserStudy />} />
-              <Route exact path="/one-time-calibration" element={<OTcalib />} />
+              <Route exact path="/pinna-config" element={<PinnaConfig />} />
               <Route exact path="/ha-fitting" element={<HAcalib />} />
               {isAdmin === true && (
                 <>

@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import * as commonAction from "../Actions/Common/CommonAction";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({ showStopStudyBtn = false, showHomeBtn = false }) => {
+const Header = ({ showStopStudyBtn = false,showExitBtn=false,showBackBtn=false, showHomeBtn = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.CommonReducer.user);
@@ -41,6 +41,24 @@ const Header = ({ showStopStudyBtn = false, showHomeBtn = false }) => {
                   class="btn btn-danger me-3"
                 >
                   Stop Study
+                </button>
+              )}
+              {showExitBtn && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/filter-config")}
+                  class="btn btn-danger me-3"
+                >
+                  Exit Filter
+                </button>
+              )}
+              {showBackBtn && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/user-config")}
+                  class="btn btn-danger me-3"
+                >
+                  Back
                 </button>
               )}
               {showHomeBtn ? (

@@ -6,14 +6,14 @@ const UserConfig = () => {
   const navigate = useNavigate();
   return (
     <>
-      <Header />
+      <Header showHomeBtn={true}/>
       <div className="inner-layout">
         <div className="container d-flex flex-column align-items-center justify-content-center h-100 dashboard">
           <div className="button-container" style={{ textAlign: 'center', margin: '20px' }}>
                   <button
                     className="btn btn-primary btn-lg"
                     type="button"
-                    onClick={() => navigate("/one-time-calibration")}
+                    onClick={() => navigate("/filter-config")}
                   >
                     One Time Calibration
                   </button>

@@ -7,7 +7,7 @@ import Play from "../Assests/Images/play.svg";
 import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
 
-const OTcalib = () => {
+const VentConfig = () => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [replayAudio, setReplayAudio] = useState(false);
@@ -150,11 +150,11 @@ const OTcalib = () => {
 
   return (
   <>
-    <Header />
+    <Header showExitBtn={true}/>
 
     <div className={styles.centeringContainer}>
       <form onSubmit={handleSubmit} className={styles.formLayout}>
-        <h2 class={styles.smallheading}>Achieve Pinna Effect</h2>
+        <h2 class={styles.smallheading}>Achieve Vent Effect</h2>
         <div className={styles.inlineGroup}>
           <label htmlFor="stepSize">Input Level (dB):</label>
           <input
@@ -251,4 +251,4 @@ const OTcalib = () => {
 );
 };
 
-  export default OTcalib;
+  export default VentConfig;

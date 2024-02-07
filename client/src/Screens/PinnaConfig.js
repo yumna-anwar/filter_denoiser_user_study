@@ -7,42 +7,18 @@ import Play from "../Assests/Images/play.svg";
 import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
 
-const HAcalib = () => {
+const PinnaConfig = () => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [replayAudio, setReplayAudio] = useState(false);
   const navigate = useNavigate();
   const [stepSize, setStepSize] = useState('2');
   const [inputLevelsL, setInputLevelsL] = useState([]);
-  const [userIds, setUserIds] = useState([]); // List of user IDs
-  const [userId, setUserId] = useState(""); // Selected user ID
   const [inputLevelsR, setInputLevelsR] = useState([]);
   const [lginputValues, setlginputValues] = useState([]);
   const [rginputValues, setrginputValues] = useState([]);
   const [gainvaluesString, setgainvaluesString] = useState([]);
   const freq_labels = ['200', '500', '1000', '2000', '3000', '4000', '6000', '8000'];
-
-  useEffect(() => {
-    fetchUserIds();
-  }, []);
-
-  // Function to fetch user IDs from the server
-  const fetchUserIds = async () => {
-    try {
-      const response = await CommonService.GetAllUsers();
-      if (response.success) {
-        const data = response.data;
-        const ids = Object.values(data).map(user => user.Id);
-        setUserIds(ids);
-      } else {
-        console.error("Failed to fetch user IDs");
-        // setgainvaluesString("Failed to fetch user IDs")
-      }
-    } catch (error) {
-      console.error("Error fetching user IDs:", error);
-      setgainvaluesString(error.message)
-    }
-  };
 
   useEffect(() => {
     const size = parseInt(stepSize, 10);
@@ -178,27 +154,7 @@ const HAcalib = () => {
 
     <div className={styles.centeringContainer}>
       <form onSubmit={handleSubmit} className={styles.formLayout}>
-        <h2 class={styles.smallheading}>HEARING AID CONFIGURATION</h2>
-
-        <div className={styles.inlineGroup}>
-            <label htmlFor="userId">Select User:</label>
-            <select
-              id="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            >
-              <option value="">Select User ID</option>
-              {userIds.map((id) => (
-                <option key={id} value={id}>
-                  {id}
-                </option>
-              ))}
-            </select>
-          </div>
-          {userId && (
-            <>
-
-
+        <h2 class={styles.smallheading}>Achieve Pinna Effect</h2>
         <div className={styles.inlineGroup}>
           <label htmlFor="stepSize">Input Level (dB):</label>
           <input
@@ -288,9 +244,6 @@ const HAcalib = () => {
 
         <button type="submit" name="save">Save</button>
         <p>{gainvaluesString}</p>
-
-        </>
-              )}
       </form>
     </div>
 
@@ -298,4 +251,4 @@ const HAcalib = () => {
 );
 };
 
-  export default HAcalib;
+  export default PinnaConfig;

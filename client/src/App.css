@@ -1,0 +1,88 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.main-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.inner-layout {
+  flex: 1;
+}
+
+.custom-header {
+  height: 80px;
+}
+.custom-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+.custom-header .name {
+  font-size: 18px;
+  font-weight: 600;
+}
+.custom-header .designation {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dashboard button {
+  padding: 40px 100px;
+  font-size: 24px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+.study-items .play {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+.study-items .play img {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+}
+.custom-sidebar {
+  height: calc(100vh - 80px);
+}
+.nav .nav-item {
+  width: 100%;
+  padding: 10px 0;
+}
+.nav .nav-item a {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+}
+.nav .nav-item a img {
+  margin-right: 14px;
+  width: 22px;
+}
+.custom-table .table {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.table .thead-dark tr th {
+  color: #fff;
+    background-color: #212529;
+    border: 0px;
+}

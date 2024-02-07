@@ -1,0 +1,59 @@
+.centeringContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.formLayout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.formInput {
+  width: 100px;
+}
+
+.submitButton {
+  width: 130px;
+  height: 50px;
+  font-size: 18px;
+  padding: 10px;
+  margin-top: 5px;
+  /* Define other button styles here */
+}
+
+/* Add to your CSS file */
+.inlineGroup {
+  display: flex;
+  flex-direction: row; /* Align children horizontally */
+  justify-content: center; /* Center-align children horizontally */
+  flex-wrap: wrap; /* Wrap children to next line if not enough space */
+  gap: 10px; /* Space between each child */
+}
+
+.inlineGroup > div {
+  display: flex;
+  flex-direction: column; /* Align label and input inline */
+  align-items: center; /* Center-align label and input vertically */
+  gap: 5px; /* Space between label and input */
+}
+
+.formLayout {
+  display: flex;
+  flex-direction: column; /* Stack form elements vertically */
+  align-items: center; /* Center-align form elements */
+}
+
+/* Adjust the width as needed */
+input[type="text"],
+input[type="number"] {
+  width: 100px; /* Adjust the width of input elements */
+}
+
+.smallheading {
+  color: #1C58C7; /* This is a hex code for a shade of blue. Replace with your desired color */
+  /* Add any other styles you want here */
+}

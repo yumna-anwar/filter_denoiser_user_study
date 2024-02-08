@@ -57,3 +57,19 @@ input[type="number"] {
   color: #1C58C7; /* This is a hex code for a shade of blue. Replace with your desired color */
   /* Add any other styles you want here */
 }
+
+.TerminalBox {
+  background-color: #ffcccc; /* Light red */
+  color: black; /* Text color */
+  padding: 20px;
+  border: 2px solid #ff9999; /* Lighter red border */
+  border-radius: 5px;
+  font-family: monospace; /* Use a monospace font to mimic terminal text */
+  white-space: pre-wrap; /* Preserve white spaces */
+}
+
+.TerminalHeader {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+}

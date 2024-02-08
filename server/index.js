@@ -240,145 +240,67 @@ app.post('/api/run-filterA-test', (req, res) => {
 
 
 
-// Function to stream audio
-function streamAudio(req, res, audioFilePath) {
-  const stat = fs.statSync(audioFilePath);
-  const fileSize = stat.size;
-  const range = req.headers.range;
-  if (range) {
-    const parts = range.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    const chunksize = end - start + 1;
-    const file = fs.createReadStream(audioFilePath, { start, end });
-    const head = {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': 'audio/wav', // Adjust MIME type as needed
-    };
-    res.writeHead(206, head);
-    file.pipe(res);
-  } else {
-    const head = {
-      'Content-Length': fileSize,
-      'Content-Type': 'audio/wav', // Adjust MIME type as needed
-    };
-    res.writeHead(200, head);
-    fs.createReadStream(audioFilePath).pipe(res);
-  }
-}
-
-// Watch for changes in the audio file
-let audioStream = null; // Variable to store the audio stream
-const filterAtestFilePath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
-fs.watchFile(filterAtestFilePath, (curr, prev) => {
-  if (curr.mtime > prev.mtime) {
-    // The audio file has changed, close the existing audio stream if it exists
-    if (audioStream) {
-      audioStream.close();
-      audioStream = null;
-    }
-    // Create a new audio stream
-    audioStream = fs.createReadStream(filterAtestFilePath);
-    console.log('Audio file has changed. Reloaded audio stream.');
-  }
-});
-
-app.get('/api/stream-filterA-audio', (req, res) => {
-  if (audioStream) {
-    // Pipe the audio stream to the response
-    audioStream.pipe(res);
-  } else {
-    // If no audio stream exists, create one and pipe it to the response
-    audioStream = fs.createReadStream(filterAtestFilePath);
-    audioStream.on('error', (err) => {
-      console.error('Error creating audio stream:', err);
-      res.status(500).send('Internal Server Error');
-    });
-    audioStream.pipe(res);
-  }
-  });
-
-// app.get('/api/stream-filterA-audio', (req, res) => {
-//     const audioFilePath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
-//     const stat = fs.statSync(audioFilePath);
-//     const fileSize = stat.size;
-//     const range = req.headers.range;
-//
-//     if (range) {
-//       const parts = range.replace(/bytes=/, '').split('-');
-//       const start = parseInt(parts[0], 10);
-//       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-//       const chunksize = end - start + 1;
-//       const file = fs.createReadStream(audioFilePath, { start, end });
-//       const head = {
-//         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-//         'Accept-Ranges': 'bytes',
-//         'Content-Length': chunksize,
-//         'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//       };
-//       res.writeHead(206, head);
-//       file.pipe(res);
-//     } else {
-//       const head = {
-//         'Content-Length': fileSize,
-//         'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//       };
-//       res.writeHead(200, head);
-//       fs.createReadStream(audioFilePath).pipe(res);
-//     }
-//   });
-
-// app.get('/api/stream-filterA-audio', (req, res) => {
-//   const audioFilePath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
+// // Function to stream audio
+// function streamAudio(req, res, audioFilePath) {
+//   const stat = fs.statSync(audioFilePath);
+//   const fileSize = stat.size;
 //   const range = req.headers.range;
-//
-//   // Get the current timestamp of the audio file
-//   const currentFileStats = fs.statSync(audioFilePath);
-//   const currentFileModificationTime = currentFileStats.mtime.toUTCString();
-//
-//   // Check if the "If-Modified-Since" header is present in the request
-//   const ifModifiedSinceHeader = req.headers['if-modified-since'];
-//
-//   // Compare the timestamps
-//   if (ifModifiedSinceHeader && ifModifiedSinceHeader === currentFileModificationTime) {
-//     // The file has not been modified, send a 304 Not Modified response
-//
-//     res.status(304).end();
+//   if (range) {
+//     const parts = range.replace(/bytes=/, '').split('-');
+//     const start = parseInt(parts[0], 10);
+//     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+//     const chunksize = end - start + 1;
+//     const file = fs.createReadStream(audioFilePath, { start, end });
+//     const head = {
+//       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+//       'Accept-Ranges': 'bytes',
+//       'Content-Length': chunksize,
+//       'Content-Type': 'audio/wav', // Adjust MIME type as needed
+//     };
+//     res.writeHead(206, head);
+//     file.pipe(res);
 //   } else {
-//     // The file has been modified or the request doesn't have an "If-Modified-Since" header
-//     // Serve the file as you did in your original code
-//     console.log('Audio file has changed. Reloaded audio stream.');
-//     if (range) {
-//       const parts = range.replace(/bytes=/, '').split('-');
-//       const start = parseInt(parts[0], 10);
-//       const end = parts[1] ? parseInt(parts[1], 10) : currentFileStats.size - 1;
-//       const chunksize = end - start + 1;
-//       const file = fs.createReadStream(audioFilePath, { start, end });
-//       const head = {
-//         'Content-Range': `bytes ${start}-${end}/${currentFileStats.size}`,
-//         'Accept-Ranges': 'bytes',
-//         'Content-Length': chunksize,
-//         'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//         'Last-Modified': currentFileModificationTime, // Set Last-Modified header
-//         'Cache-Control': 'no-store',
-//       };
-//       res.writeHead(206, head);
-//       file.pipe(res);
-//     } else {
-//       const head = {
-//         'Content-Length': currentFileStats.size,
-//         'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//         'Last-Modified': currentFileModificationTime, // Set Last-Modified header
-//         'Cache-Control': 'no-store',
-//       };
-//       res.writeHead(200, head);
-//       fs.createReadStream(audioFilePath).pipe(res);
+//     const head = {
+//       'Content-Length': fileSize,
+//       'Content-Type': 'audio/wav', // Adjust MIME type as needed
+//     };
+//     res.writeHead(200, head);
+//     fs.createReadStream(audioFilePath).pipe(res);
+//   }
+// }
+//
+// // Watch for changes in the audio file
+// let audioStream = null; // Variable to store the audio stream
+// const filterAtestFilePath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
+// fs.watchFile(filterAtestFilePath, (curr, prev) => {
+//   if (curr.mtime > prev.mtime) {
+//     // The audio file has changed, close the existing audio stream if it exists
+//     if (audioStream) {
+//       audioStream.close();
+//       audioStream = null;
 //     }
+//     // Create a new audio stream
+//     audioStream = fs.createReadStream(filterAtestFilePath);
+//     console.log('Audio file has changed. Reloaded audio stream.');
 //   }
 // });
-
+//
+// app.get('/api/stream-filterA-audio', (req, res) => {
+//   if (audioStream) {
+//     // Pipe the audio stream to the response
+//     res.setHeader('Content-Type', 'audio/wav');
+//     audioStream.pipe(res);
+//   } else {
+//     // If no audio stream exists, create one and pipe it to the response
+//     audioStream = fs.createReadStream(filterAtestFilePath);
+//     audioStream.on('error', (err) => {
+//       console.error('Error creating audio stream:', err);
+//       res.status(500).send('Internal Server Error');
+//     });
+//     audioStream.pipe(res);
+//      res.setHeader('Content-Type', 'audio/wav');
+//   }
+//   });
 
 
 app.get("/api/get-all-user-study", (req, res) => {

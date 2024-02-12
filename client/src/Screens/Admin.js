@@ -3,6 +3,7 @@ import Header from "../Components/Header";
 import { Link } from "react-router-dom";
 import Users from "../Assests/Images/multiples-users.svg";
 import Study from "../Assests/Images/study.svg";
+import Filter from "../Assests/Images/filter.png";
 import CommonService from "../Services/Common/CommonService";
 import DataTable from "react-data-table-component";
 
@@ -67,6 +68,30 @@ const Admin = () => {
                     <Link to={"/admin/user-studies"}>
                       <img src={Study} loading="lazy" />
                       Users Studies
+                    </Link>
+                  </li>
+                  <li class="nav-item">
+                    <Link to={"/admin/filter-A"}>
+                      <img src={Filter} loading="lazy" />
+                      Filter: Pinna Effect
+                    </Link>
+                  </li>
+                  <li class="nav-item">
+                    <Link to={"/admin/filter-A"}>
+                      <img src={Filter} loading="lazy" />
+                      Filter: Vent Effect
+                    </Link>
+                    </li>
+                  <li class="nav-item">
+                    <Link to={"/admin/filter-A"}>
+                      <img src={Filter} loading="lazy" />
+                      Filter: Insertion Loss
+                    </Link>
+                  </li>
+                  <li class="nav-item">
+                    <Link to={"/admin/filter-A"}>
+                      <img src={Filter} loading="lazy" />
+                      User HA Configurations
                     </Link>
                   </li>
                 </ul>

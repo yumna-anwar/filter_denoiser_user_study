@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Admin from "./Admin";
 import UserStudies from "./Admin.UserStudies";
+import FiltersA from "./Admin.FilterA";
 import Dashboard from "./Dashboard";
 import UserStudy from "./UserStudy";
 import UserConfig from "./UserConfig";
@@ -11,6 +12,7 @@ import InlossConfig from "./InlossConfig";
 import FilterConfig from "./FilterConfig";
 import PinnaConfig from "./PinnaConfig";
 import HAcalib from "./HAcalib";
+import GenerateAudio from  "./GenerateAudio"
 import Login from "./Login";
 import Register from "./Register";
 import NotFound from "../Components/NotFound";
@@ -60,10 +62,12 @@ const Loading = () => {
               <Route exact path="/user-study" element={<UserStudy />} />
               <Route exact path="/pinna-config" element={<PinnaConfig />} />
               <Route exact path="/ha-fitting" element={<HAcalib />} />
+              <Route exact path="/gen-audio" element={<GenerateAudio />} />
               {isAdmin === true && (
                 <>
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin/user-studies" element={<UserStudies />} />
+                  <Route path="/admin/filter-A" element={<FiltersA />} />
                 </>
               )}
             </>

@@ -49,6 +49,28 @@ app.get("/api/get-user/:id", (req, res) => {
   }
 });
 
+app.get("/api/get-user-gain/:id", (req, res) => {
+  const userId = req.params.id; // Get the user ID from the URL parameters
+  const query = db.prepare("SELECT * FROM UserGain WHERE id = ?");
+  const data = query.get(userId); // Use .get() to retrieve a single row
+
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
+app.get("/api/get-all-user-gain", (req, res) => {
+  const query = db.prepare("SELECT * FROM UserGain");
+  const data = query.all();
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
+
+
 app.post("/api/login", (req, res) => {
   const { UserName, Password } = req.body;
 
@@ -206,6 +228,139 @@ app.post("/api/add-user-study", (req, res) => {
   return res.status(200).json({ success: false, message: "Answer Not Submit" });
 });
 
+app.get("/api/get-filterC", (req, res) => {
+  const query = db.prepare("SELECT * FROM filterC");
+  const data = query.all();
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
+app.get("/api/get-filterB", (req, res) => {
+  const query = db.prepare("SELECT * FROM filterB");
+  const data = query.all();
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
+app.get("/api/get-filterA", (req, res) => {
+  const query = db.prepare("SELECT * FROM filterA");
+  const data = query.all();
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
+app.get("/api/get-filterC-id/:id", (req, res) => {
+  const filterId = req.params.id; // Get the user ID from the URL parameters
+  const query = db.prepare("SELECT * FROM filterC WHERE sno = ?");
+  const data = query.get(filterId); // Use .get() to retrieve a single row
+
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "Filter not found" });
+  }
+});
+app.get("/api/get-filterB-id/:id", (req, res) => {
+  const filterId = req.params.id; // Get the user ID from the URL parameters
+  const query = db.prepare("SELECT * FROM filterB WHERE sno = ?");
+  const data = query.get(filterId); // Use .get() to retrieve a single row
+
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "Filter not found" });
+  }
+});
+app.get("/api/get-filterA-id/:id", (req, res) => {
+  const filterId = req.params.id; // Get the user ID from the URL parameters
+  const query = db.prepare("SELECT * FROM filterA WHERE sno = ?");
+  const data = query.get(filterId); // Use .get() to retrieve a single row
+
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "Filter not found" });
+  }
+});
+
+app.post("/api/add-filter-A", (req, res) => {
+  const {
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000, Volume, Gaintable} = req.body;
+
+  if (!UserId || !Step || !Volume || !Gaintable) {
+    return res.status(200).json({
+      success: false,
+      message: "Missing or invalid data in the request.",
+    });
+  }
+
+  const checkUser = db.prepare(
+    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
+  );
+
+  const existingUser = checkUser.get(UserId);
+  console.log(existingUser);
+  if (existingUser.count === 0) {
+    return res.status(200).json({ success: false, message: "User Not Found." });
+  }
+
+  let statement = db.prepare(
+    "INSERT INTO filterA (UserId, step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, volume, gtable, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+  );
+
+  let info = statement.run([
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000,
+    Volume,
+    Gaintable,
+    new Date().toISOString(),
+  ]);
+
+  if (info) {
+    return res.status(200).json({ success: true, message: "Gain Table Saved" });
+  }
+  return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
+});
+
 app.post('/api/run-filterA-test', (req, res) => {
   // Extract the parameters
   // return res.status(200).json({ success: true, message: "run-filterA-test Submitted" });
@@ -230,11 +385,11 @@ app.post('/api/run-filterA-test', (req, res) => {
   exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
-      return res.status(500).send({ message: 'Script execution failed', error });
+      return res.status(500).send({ success: false, message: 'Script execution failed', error });
     }
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
-    res.send({ message: 'Script executed successfully', stdout, stderr });
+    res.send({ success: true, message: 'Script executed successfully', stdout, stderr });
   });
 });
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "../Components/Header";
 import styles from '../Components/FilterCentering.module.css';
 import CommonService from "../Services/Common/CommonService";
@@ -8,12 +10,15 @@ import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
 
 const PinnaConfig = () => {
+  const userId = useSelector((state) => state.CommonReducer.userId);
   const audioRef = useRef(null);
   const [volume, setVolume] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [replayAudio, setReplayAudio] = useState(false);
   const navigate = useNavigate();
   const [stepSize, setStepSize] = useState('2');
+  const [oldfilters, setOldfilters] = useState([]);
+  const [filterId, setFilterId] = useState('');
   const [inputLevelsL, setInputLevelsL] = useState([]);
   const [inputLevelsR, setInputLevelsR] = useState([]);
   const [lginputValues, setlginputValues] = useState([]);
@@ -32,6 +37,29 @@ const PinnaConfig = () => {
       setInputLevelsR([]);
     }
   }, [stepSize]);
+
+  useEffect(() => {
+    fetchfilter();
+  }, []);
+  const fetchfilter = async () => {
+    try {
+      const response = await CommonService.GetFilterA();
+      if (response.success) {
+        const data = response.data;
+        const userIDsAndDates = data.map(entry => ({
+          sno: entry.sno,
+          userId: entry.UserId,
+          date: entry.date
+        }));
+        setOldfilters(userIDsAndDates)
+      } else {
+        console.error("Failed to fetch filters");
+        // setgainvaluesString("Failed to fetch user IDs")
+      }
+    } catch (error) {
+      console.error("Error fetching user filters:", error);
+    }
+  };
 
   const handleInputLevelChangeL = (index, value) => {
     const newInputLevelsL = [...inputLevelsL];
@@ -82,26 +110,63 @@ const PinnaConfig = () => {
   const gainvaluesStringL = lginputValues.join(',');
   const gainvaluesStringR = rginputValues.join(',');
   // You can do different things depending on the action
+  const [multipliedValuesL,multipliedStringL] = multiplyAndConcatenate(inputLevelsL, lginputValues);
+  const [multipliedValuesR,multipliedStringR] = multiplyAndConcatenate(inputLevelsR, rginputValues);
+  const mhagainparam = '[' + multipliedStringR + multipliedStringL.slice(0, -1) + ']'; // Corrected variable name
+
   if (action === 'applyPlay') {
     // Logic for Apply & Play
-    const [multipliedValuesL,multipliedStringL] = multiplyAndConcatenate(inputLevelsL, lginputValues);
-    const [multipliedValuesR,multipliedStringR] = multiplyAndConcatenate(inputLevelsR, rginputValues);
-    const mhagainparam = '[' + multipliedStringR + multipliedStringL.slice(0, -1) + ']'; // Corrected variable name
     setgainvaluesString(mhagainparam)
+
     try {
       //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
       var payload = {
         mhagainparam: mhagainparam
       };
       const response = await CommonService.RunFilterAtest(payload);
-      setgainvaluesString(mhagainparam+'\n'+response.message)
+      setgainvaluesString(mhagainparam)
+      if (response.success) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+
     } catch (error) {
-      setgainvaluesString(mhagainparam+'\n'+error.message)
+      setgainvaluesString(mhagainparam)
+      toast.error(error.message);
     }
 
   } else if (action === 'save') {
     // Logic for Save
-    setgainvaluesString(gainvaluesString+"\nFilter saved")
+    var payload = {
+      UserId: userId,
+      Step: stepSize,
+      RHz200: rginputValues[0],
+      RHz500: rginputValues[1],
+      RHz1000: rginputValues[2],
+      RHz2000: rginputValues[3],
+      RHz3000: rginputValues[4],
+      RHz4000: rginputValues[5],
+      RHz6000: rginputValues[6],
+      RHz8000: rginputValues[7],
+      LHz200: lginputValues[0],
+      LHz500: lginputValues[1],
+      LHz1000: lginputValues[2],
+      LHz2000: lginputValues[3],
+      LHz3000: lginputValues[4],
+      LHz4000: lginputValues[5],
+      LHz6000: lginputValues[6],
+      LHz8000: lginputValues[7],
+      Volume: volume,
+      Gaintable: mhagainparam
+    };
+    var response = await CommonService.AddFilterA(payload);
+    if (response.success) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+    setgainvaluesString(gainvaluesString+"\n"+response.message)
   }
 };
 
@@ -110,11 +175,13 @@ const handlePlayPauseAudio = () => {
     if (audioElement) {
       if (isPlaying) {
         audioElement.pause(); // Pause audio playback
-        setlogString("Audio Paused");
+        //setlogString("Audio Paused");
+        toast.success("Audio Paused");
       } else {
         audioElement.volume=0.5
         audioElement.play(); // Start audio playback
-        setlogString("Audio Playing");
+        //setlogString("Audio Playing");
+        toast.success("Audio Playing");
       }
       setIsPlaying(!isPlaying); // Toggle the play state
     }
@@ -144,10 +211,12 @@ const handlePlayPauseAudio = () => {
       audioElement.play()
         .then(() => {
           setIsPlaying(true); // Update isPlaying state
-          setlogString("Audio Reloaded");
+          //setlogString("Audio Reloaded");
+          toast.success("Audio Reloaded");
         })
         .catch((error) => {
-          setlogString("Error playing audio:" + error.message);
+          //setlogString("Error playing audio:" + error.message);
+          toast.success(error.message);
         });
       }
     };
@@ -165,9 +234,35 @@ const handlePlayPauseAudio = () => {
     const audioElement = audioRef.current;
     if (audioElement) {
       audioElement.volume = parseFloat(e.target.value);
-      setlogString("Volume changed to:" + e.target.value);
+      //setlogString("Volume changed to:" + e.target.value);
+      toast.success("Volume changed to: " + e.target.value);
     }
   };
+
+  const handleFilterSelection = async (e) => {
+    const newFilterId = e.target.value;
+    setFilterId(newFilterId);
+    const response = await CommonService.GetFilterAById(newFilterId);
+    const data = response.data
+    setStepSize(data.step);
+    setrginputValues([data.R200hz,data.R500hz,data.R1000hz,data.R2000hz,data.R3000hz,data.R4000hz,data.R6000hz,data.R8000hz])
+    setlginputValues([data.L200hz,data.L500hz,data.L1000hz,data.L2000hz,data.L3000hz,data.R4000hz,data.L6000hz,data.L8000hz])
+    setVolume(data.volume)
+    if (response.success) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+
+    //
+    //toast.success("Selected Filter ID: " + filterId);
+    };
+
+    // useEffect(() => {
+    // if (filterId !== '') {
+    //     toast.success("Selected Filter ID: " + filterId);
+    //   }
+    // }, [filterId]);
 
   return (
   <>
@@ -176,6 +271,21 @@ const handlePlayPauseAudio = () => {
     <div className={styles.centeringContainer}>
       <form onSubmit={handleSubmit} className={styles.formLayout}>
         <h2 class={styles.smallheading}>Achieve Pinna Effect</h2>
+        <div className={styles.inlineGroup}>
+            <label htmlFor="userId">Load from previously saved:</label>
+            <select
+              id="filterId"
+              value={filterId}
+              onChange={handleFilterSelection}
+            >
+              <option value="">Load from previously saved</option>
+              {oldfilters.map(({ sno, userId, date }) => (
+                <option key={sno} value={sno}>
+                  {`${sno} - ${userId} - ${date}`}
+                </option>
+              ))}
+            </select>
+          </div>
 
         <div className={styles.inlineGroup}>
         <button
@@ -276,22 +386,28 @@ const handlePlayPauseAudio = () => {
           ))}
         </div>
 
-        <button type="submit" name="applyPlay">Apply & Play</button>
-        <button type="submit" name="save">Save</button>
+        <button type="submit" name="applyPlay"
+        className={`button btn btn-lg btn-secondary play mb-3 ${styles.playButton}`}
+        style={{ width: "100px", height: "50px" }}>Apply</button>
+        <button type="submit" name="save"
+        className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
+        style={{ width: "80px", height: "50px" }}>Save</button>
 
-        <div className={styles.TerminalBox}>
-        <div className={styles.TerminalHeader}>Debug</div>
-        <p>{gainvaluesString}</p>
-        <p>{logString}</p>
 
-      </div>
 
-        <p></p>
+
       </form>
     </div>
 
   </>
 );
 };
+
+// <div className={styles.TerminalBox}>
+// <div className={styles.TerminalHeader}>Debug</div>
+// <p>{gainvaluesString}</p>
+// <p>{logString}</p>
+// </div>
+
 
   export default PinnaConfig;

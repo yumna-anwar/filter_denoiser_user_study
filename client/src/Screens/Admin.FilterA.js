@@ -165,19 +165,19 @@ const FiltersA = () => {
                     </Link>
                   </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/filter-B"}>
                       <img src={Filter} loading="lazy" />
                       Filter: Vent Effect
                     </Link>
                     </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/filter-C"}>
                       <img src={Filter} loading="lazy" />
                       Filter: Insertion Loss
                     </Link>
                   </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/user-gains"}>
                       <img src={Filter} loading="lazy" />
                       User HA Configurations
                     </Link>
@@ -188,7 +188,7 @@ const FiltersA = () => {
             </div>
             <div class="col p-3 overflow-x-auto">
               <DataTable
-                title="Filter A"
+                title="Filter A: Pinna Effect"
                 columns={columns}
                 data={filters}
                 pagination

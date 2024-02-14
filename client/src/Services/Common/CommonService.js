@@ -3,12 +3,28 @@ import RestClient from "../RestClient";
 const RunFilterAtest = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/run-filterA-test`, payload);
 };
-const PlayFilterAtest = (payload) => {
-  return RestClient.Get(`http://localhost:3001/api/stream-filterA-audio`);
+const RunFilterBtest = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/run-filterB-test`, payload);
 };
+const RunFilterCtest = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/run-filterC-test`, payload);
+};
+const RunUserGaintest = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/run-userGain-test`, payload);
+};
+
 
 const AddFilterA = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/add-filter-A`, payload);
+};
+const AddFilterB = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/add-filter-B`, payload);
+};
+const AddFilterC = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/add-filter-C`, payload);
+};
+const AddUserGain = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/add-user-gain`, payload);
 };
 
 // GET ALL SAVED FILTER SELECT * FROM filter
@@ -20,6 +36,9 @@ const GetFilterB = (payload) => {
 };
 const GetFilterC = (payload) => {
   return RestClient.Get(`http://localhost:3001/api/get-filterC`);
+};
+const GetUserGain = (payload) => {
+  return RestClient.Get(`http://localhost:3001/api/get-usergain`);
 };
 
 // GET ONE OF THE FILTER SELECT * FROM filter WHERE sno = ?
@@ -63,10 +82,20 @@ const GetUserById = (id) => {
 
 const exportedObject = {
   RunFilterAtest,
-  PlayFilterAtest,
+  RunFilterBtest,
+  RunFilterCtest,
+  RunUserGaintest,
   AddFilterA,
+  AddFilterB,
+  AddFilterC,
+  AddUserGain,
   GetFilterA,
+  GetFilterB,
+  GetFilterC,
+  GetUserGain,
   GetFilterAById,
+  GetFilterBById,
+  GetFilterCById,
   Login,
   Register,
   GetAllFiles,

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "../Components/Header";
 import styles from '../Components/FilterCentering.module.css';
 import CommonService from "../Services/Common/CommonService";
@@ -8,6 +10,7 @@ import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
 
 const HAcalib = () => {
+  const currentuserId = useSelector((state) => state.CommonReducer.userId);
   const audioRef = useRef(null);
   const [volume, setVolume] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -106,12 +109,13 @@ const HAcalib = () => {
   const gainvaluesStringL = lginputValues.join(',');
   const gainvaluesStringR = rginputValues.join(',');
   // You can do different things depending on the action
+  const [multipliedValuesL,multipliedStringL] = multiplyAndConcatenate(inputLevelsL, lginputValues);
+  const [multipliedValuesR,multipliedStringR] = multiplyAndConcatenate(inputLevelsR, rginputValues);
+  const mhagainparam = '[' + multipliedStringR + multipliedStringL.slice(0, -1) + ']'; // Corrected variable name
+  setgainvaluesString('['+multipliedStringR+multipliedStringL.slice(0, -1)+']')
+
   if (action === 'applyPlay') {
     // Logic for Apply & Play
-    const [multipliedValuesL,multipliedStringL] = multiplyAndConcatenate(inputLevelsL, lginputValues);
-    const [multipliedValuesR,multipliedStringR] = multiplyAndConcatenate(inputLevelsR, rginputValues);
-    const mhagainparam = '[' + multipliedStringR + multipliedStringL.slice(0, -1) + ']'; // Corrected variable name
-    setgainvaluesString('['+multipliedStringR+multipliedStringL.slice(0, -1)+']')
     try {
       //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
       var payload = {
@@ -126,7 +130,36 @@ const HAcalib = () => {
 
   } else if (action === 'save') {
     // Logic for Save
-    setgainvaluesString(gainvaluesString)
+    var payload = {
+      UserId: currentuserId,
+      ParticipantID: userId,
+      Step: stepSize,
+      RHz200: rginputValues[0],
+      RHz500: rginputValues[1],
+      RHz1000: rginputValues[2],
+      RHz2000: rginputValues[3],
+      RHz3000: rginputValues[4],
+      RHz4000: rginputValues[5],
+      RHz6000: rginputValues[6],
+      RHz8000: rginputValues[7],
+      LHz200: lginputValues[0],
+      LHz500: lginputValues[1],
+      LHz1000: lginputValues[2],
+      LHz2000: lginputValues[3],
+      LHz3000: lginputValues[4],
+      LHz4000: lginputValues[5],
+      LHz6000: lginputValues[6],
+      LHz8000: lginputValues[7],
+      Volume: volume,
+      Gaintable: mhagainparam
+    };
+    var response = await CommonService.AddUserGain(payload);
+    if (response.success) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+    setgainvaluesString(gainvaluesString+"\n"+response.message)
   }
 };
 

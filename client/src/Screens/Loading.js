@@ -4,6 +4,9 @@ import { useSelector } from "react-redux";
 import Admin from "./Admin";
 import UserStudies from "./Admin.UserStudies";
 import FiltersA from "./Admin.FilterA";
+import FiltersB from "./Admin.FilterB";
+import FiltersC from "./Admin.FilterC";
+import UserGains from "./Admin.UserGain";
 import Dashboard from "./Dashboard";
 import UserStudy from "./UserStudy";
 import UserConfig from "./UserConfig";
@@ -68,6 +71,11 @@ const Loading = () => {
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin/user-studies" element={<UserStudies />} />
                   <Route path="/admin/filter-A" element={<FiltersA />} />
+                  <Route path="/admin/filter-B" element={<FiltersB />} />
+                  <Route path="/admin/filter-C" element={<FiltersC />} />
+                  <Route path="/admin/user-gains" element={<UserGains />} />
+
+
                 </>
               )}
             </>

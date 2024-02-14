@@ -255,6 +255,15 @@ app.get("/api/get-filterA", (req, res) => {
     res.status(200).json({ success: false, message: "User not found" });
   }
 });
+app.get("/api/get-usergain", (req, res) => {
+  const query = db.prepare("SELECT * FROM UserGain");
+  const data = query.all();
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User not found" });
+  }
+});
 app.get("/api/get-filterC-id/:id", (req, res) => {
   const filterId = req.params.id; // Get the user ID from the URL parameters
   const query = db.prepare("SELECT * FROM filterC WHERE sno = ?");
@@ -361,25 +370,233 @@ app.post("/api/add-filter-A", (req, res) => {
   return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
 });
 
+app.post("/api/add-filter-B", (req, res) => {
+  const {
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000, Volume, Gaintable} = req.body;
+
+  if (!UserId || !Step || !Volume || !Gaintable) {
+    return res.status(200).json({
+      success: false,
+      message: "Missing or invalid data in the request.",
+    });
+  }
+
+  const checkUser = db.prepare(
+    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
+  );
+
+  const existingUser = checkUser.get(UserId);
+  console.log(existingUser);
+  if (existingUser.count === 0) {
+    return res.status(200).json({ success: false, message: "User Not Found." });
+  }
+
+  let statement = db.prepare(
+    "INSERT INTO filterB (UserId, step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, volume, gtable, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+  );
+
+  let info = statement.run([
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000,
+    Volume,
+    Gaintable,
+    new Date().toISOString(),
+  ]);
+
+  if (info) {
+    return res.status(200).json({ success: true, message: "Gain Table Saved" });
+  }
+  return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
+});
+
+app.post("/api/add-filter-C", (req, res) => {
+  const {
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000, Volume, Gaintable} = req.body;
+
+  if (!UserId || !Step || !Volume || !Gaintable) {
+    return res.status(200).json({
+      success: false,
+      message: "Missing or invalid data in the request.",
+    });
+  }
+
+  const checkUser = db.prepare(
+    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
+  );
+
+  const existingUser = checkUser.get(UserId);
+  console.log(existingUser);
+  if (existingUser.count === 0) {
+    return res.status(200).json({ success: false, message: "User Not Found." });
+  }
+
+  let statement = db.prepare(
+    "INSERT INTO filterC (UserId, step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, volume, gtable, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+  );
+
+  let info = statement.run([
+    UserId,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000,
+    Volume,
+    Gaintable,
+    new Date().toISOString(),
+  ]);
+
+  if (info) {
+    return res.status(200).json({ success: true, message: "Gain Table Saved" });
+  }
+  return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
+});
+
+app.post("/api/add-user-gain", (req, res) => {
+  const {
+    UserId,
+    ParticipantID,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000, Volume, Gaintable} = req.body;
+
+  if (!UserId || !Step || !Volume || !Gaintable) {
+    return res.status(200).json({
+      success: false,
+      message: "Missing or invalid data in the request.",
+    });
+  }
+
+  const checkUser = db.prepare(
+    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
+  );
+
+  const existingUser = checkUser.get(UserId);
+  console.log(existingUser);
+  if (existingUser.count === 0) {
+    return res.status(200).json({ success: false, message: "User Not Found." });
+  }
+
+  let statement = db.prepare(
+    "INSERT INTO UserGain (UserId, participantID, step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, volume, gtable, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+  );
+
+  let info = statement.run([
+    UserId,
+    ParticipantID,
+    Step,
+    RHz200,
+    RHz500,
+    RHz1000,
+    RHz2000,
+    RHz3000,
+    RHz4000,
+    RHz6000,
+    RHz8000,
+    LHz200,
+    LHz500,
+    LHz1000,
+    LHz2000,
+    LHz3000,
+    LHz4000,
+    LHz6000,
+    LHz8000,
+    Volume,
+    Gaintable,
+    new Date().toISOString(),
+  ]);
+
+  if (info) {
+    return res.status(200).json({ success: true, message: "Gain Table Saved" });
+  }
+  return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
+});
+
 app.post('/api/run-filterA-test', (req, res) => {
-  // Extract the parameters
-  // return res.status(200).json({ success: true, message: "run-filterA-test Submitted" });
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   const {mhagainparam} = req.body;
-
-  // const sourceAudioPath = `${baseUrl}/assets/test_sentence/stereo_ISTS.wav`;
-  // const destAudioPath = `${baseUrl}/assets/test_sentence/filterA-test/stereo_ISTS.wav`;
-  // const scriptPath = `${baseUrl}/assets/MHAconfigs/Test_FilterA.sh`;
-
   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_FilterA.sh");
   const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
   const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
-
-  // Basic validation example
   if (!mhagainparam || typeof mhagainparam !== 'string') {
     return res.status(400).send({ message: 'Invalid parameter' });
   }
-  // Add single quotes around mhagainparam
   const mhagainparamWithQuotes = `'${mhagainparam}'`;
   console.log(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`);
   exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
@@ -389,7 +606,71 @@ app.post('/api/run-filterA-test', (req, res) => {
     }
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
-    res.send({ success: true, message: 'Script executed successfully', stdout, stderr });
+    res.send({ success: true, message: 'Script A executed successfully', stdout, stderr });
+  });
+});
+app.post('/api/run-filterB-test', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const {mhagainparam} = req.body;
+  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterB-test/stereo_ISTS.wav");
+  if (!mhagainparam || typeof mhagainparam !== 'string') {
+    return res.status(400).send({ message: 'Invalid parameter' });
+  }
+  const mhagainparamWithQuotes = `'${mhagainparam}'`;
+  console.log(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`);
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ success: false, message: 'Script execution failed', error });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ success: true, message: 'Script B executed successfully', stdout, stderr });
+  });
+});
+app.post('/api/run-filterC-test', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const {mhagainparam} = req.body;
+  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterC-test/stereo_ISTS.wav");
+  if (!mhagainparam || typeof mhagainparam !== 'string') {
+    return res.status(400).send({ message: 'Invalid parameter' });
+  }
+  const mhagainparamWithQuotes = `'${mhagainparam}'`;
+  console.log(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`);
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ success: false, message: 'Script execution failed', error });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ success: true, message: 'Script C executed successfully', stdout, stderr });
+  });
+});
+
+app.post('/api/run-userGain-test', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const {mhagainparam} = req.body;
+  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_UserGain.sh");
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS.wav");
+  if (!mhagainparam || typeof mhagainparam !== 'string') {
+    return res.status(400).send({ message: 'Invalid parameter' });
+  }
+  const mhagainparamWithQuotes = `'${mhagainparam}'`;
+  console.log(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`);
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ success: false, message: 'Script for user gain execution failed', error });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ success: true, message: 'Script for user gain executed successfully', stdout, stderr });
   });
 });
 

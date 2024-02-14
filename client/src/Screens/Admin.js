@@ -77,19 +77,19 @@ const Admin = () => {
                     </Link>
                   </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/filter-B"}>
                       <img src={Filter} loading="lazy" />
                       Filter: Vent Effect
                     </Link>
                     </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/filter-C"}>
                       <img src={Filter} loading="lazy" />
                       Filter: Insertion Loss
                     </Link>
                   </li>
                   <li class="nav-item">
-                    <Link to={"/admin/filter-A"}>
+                    <Link to={"/admin/user-gains"}>
                       <img src={Filter} loading="lazy" />
                       User HA Configurations
                     </Link>

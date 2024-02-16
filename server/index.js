@@ -652,26 +652,55 @@ app.post('/api/run-filterC-test', (req, res) => {
   });
 });
 
+
+async function runScript(scriptPath, sourcePath, destPath, param) {
+  try {
+    const { stdout, stderr } = await exec(`${scriptPath} ${sourcePath} ${destPath} ${param}`);
+    console.log(stdout);
+    if (stderr) {
+      console.error(stderr);
+    }
+  } catch (error) {
+    console.error(`exec error: ${error}`);
+    throw new Error('Script execution failed');
+  }
+}
+
 app.post('/api/run-userGain-test', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const {mhagainparam} = req.body;
+  const {mhagainparam, filterAparam, filterBparam, filterCparam} = req.body;
+
   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_UserGain.sh");
+  const scriptPath_filterA = path.join(__dirname, "/assets/MHAconfigs/Test_FilterA.sh");
+  const scriptPath_filterB = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
+  const scriptPath_filterC = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
+
   const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-  const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_HApath.wav");
+
+  const sourceAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+  const destAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_Directpath.wav");
+
   if (!mhagainparam || typeof mhagainparam !== 'string') {
     return res.status(400).send({ message: 'Invalid parameter' });
   }
   const mhagainparamWithQuotes = `'${mhagainparam}'`;
-  console.log(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`);
-  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes}`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return res.status(500).send({ success: false, message: 'Script for user gain execution failed', error });
-    }
-    console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
-    res.send({ success: true, message: 'Script for user gain executed successfully', stdout, stderr });
-  });
+  const filterAparamWithQuotes = `'${filterAparam}'`;
+  const filterBparamWithQuotes = `'${filterBparam}'`;
+  const filterCparamWithQuotes = `'${filterCparam}'`;
+  try {
+    // HEARING AID PATH
+    await runScript(scriptPath, sourceAudioPath, destAudioPath, mhagainparamWithQuotes);
+    await runScript(scriptPath_filterB, destAudioPath, destAudioPath, filterBparamWithQuotes);
+    // DIRECT path
+    await runScript(scriptPath_filterA, sourceAudioPath_DIRECT, destAudioPath_DIRECT, filterAparamWithQuotes);
+    await runScript(scriptPath_filterC, destAudioPath_DIRECT, destAudioPath_DIRECT, filterCparamWithQuotes);
+
+    res.send({ success: true, message: 'Scripts executed successfully' });
+  } catch (error) {
+    res.status(500).send({ success: false, message: error.message });
+  }
+
 });
 
 

@@ -3,4 +3,5 @@
 
 
 ## Getting started
-
+compile MHA from source
+brew install ffmpeg

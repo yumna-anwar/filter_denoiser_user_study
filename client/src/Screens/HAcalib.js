@@ -26,8 +26,19 @@ const HAcalib = () => {
   const [gainvaluesString, setgainvaluesString] = useState([]);
   const [logString, setlogString] = useState([]);
   const freq_labels = ['200', '500', '1000', '2000', '3000', '4000', '6000', '8000'];
-
+  const [oldfiltersA, setOldfiltersA] = useState([]);
+  const [oldfiltersB, setOldfiltersB] = useState([]);
+  const [oldfiltersC, setOldfiltersC] = useState([]);
+  const [filterIdA, setFilterIdA] = useState('');
+  const [filterIdB, setFilterIdB] = useState('');
+  const [filterIdC, setFilterIdC] = useState('');
+  const [filterAgtable, setFilterAgtable] = useState('');
+  const [filterBgtable, setFilterBgtable] = useState('');
+  const [filterCgtable, setFilterCgtable] = useState('');
   useEffect(() => {
+    fetchfilter("A");
+    fetchfilter("B");
+    fetchfilter("C");
     fetchUserIds();
   }, []);
 
@@ -46,6 +57,50 @@ const HAcalib = () => {
     } catch (error) {
       console.error("Error fetching user IDs:", error);
       setgainvaluesString(error.message)
+    }
+  };
+  const fetchfilter = async (filterType) => {
+    try {
+      let response;
+      if (filterType=="A"){
+        response = await CommonService.GetFilterA();
+        //toast.success("Filter A Found");
+      } else if (filterType=="B"){
+        response = await CommonService.GetFilterB();
+        //toast.success("Filter B Found");
+      }else if (filterType=="C"){
+        response = await CommonService.GetFilterC();
+        //toast.success("Filter C Found");
+      }else{
+        toast.error("Filter not identified");
+        response = await CommonService.GetFilterA();
+      }
+
+      if (response.success) {
+        const data = response.data;
+        const userIDsAndDates = data.map(entry => ({
+          sno: entry.sno,
+          userId: entry.UserId,
+          date: entry.date
+        }));
+
+        if (filterType=="A"){
+          setOldfiltersA(userIDsAndDates)
+        } else if (filterType=="B"){
+          setOldfiltersB(userIDsAndDates)
+        }else if (filterType=="C"){
+          setOldfiltersC(userIDsAndDates)
+        }else{
+          toast.error("Filter not identified");
+          response = await CommonService.GetFilterA();
+        }
+
+      } else {
+        console.error("Failed to fetch filters");
+        // setgainvaluesString("Failed to fetch user IDs")
+      }
+    } catch (error) {
+      console.error("Error fetching user filters:", error);
     }
   };
 
@@ -119,13 +174,16 @@ const HAcalib = () => {
     try {
       //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
       var payload = {
-        mhagainparam: mhagainparam
+        mhagainparam: mhagainparam,
+        filterAparam: filterAgtable,
+        filterBparam: filterBgtable,
+        filterCparam: filterBgtable
       };
-      const response = await CommonService.RunFilterAtest(payload);
-      setgainvaluesString(response.message)
+      const response = await CommonService.RunUserGaintest(payload);
+      toast.success(response.message)
     } catch (error) {
       console.error('Error:', error);
-      setgainvaluesString( error.message)
+      toast.success( error.message)
     }
 
   } else if (action === 'save') {
@@ -168,11 +226,11 @@ const handlePlayPauseAudio = () => {
     if (audioElement) {
       if (isPlaying) {
         audioElement.pause(); // Pause audio playback
-        setlogString("Audio Paused");
+        toast.success("Audio Paused");
       } else {
         audioElement.volume=0.5
         audioElement.play(); // Start audio playback
-        setlogString("Audio Playing");
+        toast.success("Audio Playing");
       }
       setIsPlaying(!isPlaying); // Toggle the play state
     }
@@ -186,7 +244,7 @@ const handlePlayPauseAudio = () => {
       }
 
       // Set the audio source URL with a unique query parameter
-      const audioSourceUrl = "http://localhost:3001/assets/test_sentence/filterA-test/stereo_ISTS.wav";
+      const audioSourceUrl = "http://localhost:3001/assets/test_sentence/userGain-test/Combined_0_stereo_ISTS.wav";
       const uniqueUrl = audioSourceUrl + "?t=" + Date.now(); // Append current timestamp as query parameter
       audioElement.src = uniqueUrl;
 
@@ -200,10 +258,10 @@ const handlePlayPauseAudio = () => {
       audioElement.play()
         .then(() => {
           setIsPlaying(true); // Update isPlaying state
-          setlogString("Audio Reloaded");
+          toast.success("Audio Reloaded");
         })
         .catch((error) => {
-          setlogString("Error playing audio:" + error.message);
+          toast.error("Error playing audio:" + error.message);
         });
       }
     };
@@ -221,10 +279,53 @@ const handlePlayPauseAudio = () => {
     const audioElement = audioRef.current;
     if (audioElement) {
       audioElement.volume = parseFloat(e.target.value);
-      setlogString("Volume changed to:" + e.target.value);
+      toast.success("Volume changed to:" + e.target.value);
+
     }
   };
 
+  const handleUsergainSelection = async (e) => {
+    const newParticipantId = e.target.value;
+    setUserId(newParticipantId);
+    const response = await CommonService.GetUserGainById(newParticipantId);
+
+    if (response.success) {
+      const data = response.data
+      setStepSize(data.step);
+      setrginputValues([data.R200hz,data.R500hz,data.R1000hz,data.R2000hz,data.R3000hz,data.R4000hz,data.R6000hz,data.R8000hz])
+      setlginputValues([data.L200hz,data.L500hz,data.L1000hz,data.L2000hz,data.L3000hz,data.R4000hz,data.L6000hz,data.L8000hz])
+      setVolume(data.volume)
+      toast.success(response.message);
+    } else {
+      setStepSize(2);
+      setrginputValues([0,0,0,0,0,0,0,0])
+      setlginputValues([0,0,0,0,0,0,0,0])
+      setVolume(0.5)
+      toast.error(response.message);
+    }
+    };
+
+    const handleFilterSelection = async (e, filterType) => {
+      const newFilterId = e.target.value;
+      setFilterIdA(newFilterId)
+      let response;
+      if (filterType=="A"){
+         response = await CommonService.GetFilterAById(newFilterId);
+
+         setFilterAgtable(response.data.gtable)
+      } else if (filterType=="B"){
+         response = await CommonService.GetFilterBById(newFilterId);
+         setFilterBgtable(response.data.gtable)
+      }else if (filterType=="C"){
+         response = await CommonService.GetFilterCById(newFilterId);
+         setFilterCgtable(response.data.gtable)
+      }else{
+        toast.error("Filter not identified");
+      }
+
+      const data = response.data
+      toast.success(data.gtable);
+      };
 
   return (
   <>
@@ -233,13 +334,60 @@ const handlePlayPauseAudio = () => {
     <div className={styles.centeringContainer}>
       <form onSubmit={handleSubmit} className={styles.formLayout}>
         <h2 class={styles.smallheading}>HEARING AID CONFIGURATION</h2>
-
+        <div className={styles.inlineGroup}>
+            <label htmlFor="userId">Load Filter A:</label>
+            <select
+              id="filterIdA"
+              value={filterIdA}
+              onChange={(e) => handleFilterSelection(e, 'A')}
+            >
+              <option value="">Load Filter A</option>
+              {oldfiltersA.map(({ sno, userId, date }) => (
+                <option key={sno} value={sno}>
+                  {`${sno} - ${userId} - ${date}`}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p>Selected Filter A gain table: {filterAgtable}</p>
+          <div className={styles.inlineGroup}>
+              <label htmlFor="userId">Load Filter B:</label>
+              <select
+                id="filterIdB"
+                value={filterIdB}
+                onChange={(e) => handleFilterSelection(e, 'B')}
+              >
+                <option value="">Load Filter B</option>
+                {oldfiltersB.map(({ sno, userId, date }) => (
+                  <option key={sno} value={sno}>
+                    {`${sno} - ${userId} - ${date}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p>Selected Filter B gain table: {filterBgtable}</p>
+            <div className={styles.inlineGroup}>
+                <label htmlFor="userId">Load Filter C:</label>
+                <select
+                  id="filterIdC"
+                  value={filterIdC}
+                  onChange={(e) => handleFilterSelection(e, 'C')}
+                >
+                  <option value="">Load Filter C</option>
+                  {oldfiltersC.map(({ sno, userId, date }) => (
+                    <option key={sno} value={sno}>
+                      {`${sno} - ${userId} - ${date}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p>Selected Filter C gain table: {filterCgtable}</p>
         <div className={styles.inlineGroup}>
             <label htmlFor="userId">Select User:</label>
             <select
               id="userId"
               value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              onChange={handleUsergainSelection}
             >
               <option value="">Select User ID</option>
               {userIds.map((id) => (
@@ -251,6 +399,7 @@ const handlePlayPauseAudio = () => {
           </div>
           {userId && (
             <>
+
 
             <div className={styles.inlineGroup}>
             <button
@@ -273,7 +422,7 @@ const handlePlayPauseAudio = () => {
               /></button>
 
               <audio ref={audioRef} >
-                <source src="http://localhost:3001/assets/test_sentence/filterA-test/stereo_ISTS.wav" type="audio/wav" />
+                <source src="http://localhost:3001/assets/test_sentence/userGain-test/Combined_0_stereo_ISTS.wav" type="audio/wav" />
                 Your browser does not support the audio element.
               </audio>
               </div>
@@ -351,15 +500,14 @@ const handlePlayPauseAudio = () => {
               ))}
             </div>
 
-            <button type="submit" name="applyPlay">Apply & Play</button>
-            <button type="submit" name="save">Save</button>
+            <button type="submit" name="applyPlay"
+            className={`button btn btn-lg btn-secondary play mb-3 ${styles.playButton}`}
+            style={{ width: "100px", height: "50px" }}>Apply</button>
+            <button type="submit" name="save"
+            className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
+            style={{ width: "80px", height: "50px" }}>Save</button>
 
-            <div className={styles.TerminalBox}>
-            <div className={styles.TerminalHeader}>Debug</div>
-            <p>{gainvaluesString}</p>
-            <p>{logString}</p>
 
-          </div>
           </>
               )}
       </form>

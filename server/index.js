@@ -159,6 +159,8 @@ app.post("/api/register", (req, res) => {
     .json({ success: false, message: "Registration Not Complete" });
 });
 
+
+// ASSESTS/USERID/MODELNAME_SNR_SENTENCENAME.WAV
 app.get("/api/list-files", (req, res) => {
   const assetsFolder = path.join(__dirname, "assets/stimulisentences"); // Replace 'assets' with your folder name
   const baseUrl = `${req.protocol}://${req.get("host")}`; // Construct the base URL
@@ -295,6 +297,17 @@ app.get("/api/get-filterA-id/:id", (req, res) => {
     res.status(200).json({ success: true, data });
   } else {
     res.status(200).json({ success: false, message: "Filter not found" });
+  }
+});
+app.get("/api/get-usergain-id/:id", (req, res) => {
+  const filterId = req.params.id; // Get the user ID from the URL parameters
+  const query = db.prepare("SELECT * FROM UserGain WHERE ParticipantID = ?");
+  const data = query.get(filterId); // Use .get() to retrieve a single row
+
+  if (data) {
+    res.status(200).json({ success: true, data });
+  } else {
+    res.status(200).json({ success: false, message: "User data not found" });
   }
 });
 
@@ -542,50 +555,76 @@ app.post("/api/add-user-gain", (req, res) => {
       message: "Missing or invalid data in the request.",
     });
   }
+  // Check for existing record with the given ParticipantID
+  const checkParticipant = db.prepare("SELECT COUNT(*) as count FROM UserGain WHERE ParticipantID = ?");
+  const existingRecord = checkParticipant.get(ParticipantID);
+  if (existingRecord.count > 0) {
+    // Update existing record
+    const updateStmt = db.prepare(
+      `UPDATE UserGain
+      SET UserId = ?, Step = ?, R200hz = ?, R500hz = ?, R1000hz = ?, R2000hz = ?, R3000hz = ?, R4000hz = ?, R6000hz = ?, R8000hz = ?,
+          L200hz = ?, L500hz = ?, L1000hz = ?, L2000hz = ?, L3000hz = ?, L4000hz = ?, L6000hz = ?, L8000hz = ?, Volume = ?, Gtable = ?, Date = ?
+      WHERE ParticipantID = ?`
+    );
+    let info = updateStmt.run(
+      UserId,
+      Step,
+      RHz200,
+      RHz500,
+      RHz1000,
+      RHz2000,
+      RHz3000,
+      RHz4000,
+      RHz6000,
+      RHz8000,
+      LHz200,
+      LHz500,
+      LHz1000,
+      LHz2000,
+      LHz3000,
+      LHz4000,
+      LHz6000,
+      LHz8000,
+      Volume,
+      Gaintable,
+      new Date().toISOString(),
+      ParticipantID
+    );
+  } else {
+      // Insert new record
+      let statement = db.prepare(
+        `INSERT INTO UserGain (UserId, ParticipantID, Step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, Volume, Gtable, Date)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      );
 
-  const checkUser = db.prepare(
-    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
-  );
+      let info = statement.run(
+        UserId,
+        ParticipantID,
+        Step,
+        RHz200,
+        RHz500,
+        RHz1000,
+        RHz2000,
+        RHz3000,
+        RHz4000,
+        RHz6000,
+        RHz8000,
+        LHz200,
+        LHz500,
+        LHz1000,
+        LHz2000,
+        LHz3000,
+        LHz4000,
+        LHz6000,
+        LHz8000,
+        Volume,
+        Gaintable,
+        new Date().toISOString()
+      );
+    }
+    // Simplify response for brevity, check actual operation success in practice
+  return res.status(200).json({ success: true, message: "Operation completed successfully." });
 
-  const existingUser = checkUser.get(UserId);
-  console.log(existingUser);
-  if (existingUser.count === 0) {
-    return res.status(200).json({ success: false, message: "User Not Found." });
-  }
-
-  let statement = db.prepare(
-    "INSERT INTO UserGain (UserId, participantID, step, R200hz, R500hz, R1000hz, R2000hz, R3000hz, R4000hz, R6000hz, R8000hz, L200hz, L500hz, L1000hz, L2000hz, L3000hz, L4000hz, L6000hz, L8000hz, volume, gtable, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-  );
-
-  let info = statement.run([
-    UserId,
-    ParticipantID,
-    Step,
-    RHz200,
-    RHz500,
-    RHz1000,
-    RHz2000,
-    RHz3000,
-    RHz4000,
-    RHz6000,
-    RHz8000,
-    LHz200,
-    LHz500,
-    LHz1000,
-    LHz2000,
-    LHz3000,
-    LHz4000,
-    LHz6000,
-    LHz8000,
-    Volume,
-    Gaintable,
-    new Date().toISOString(),
-  ]);
-
-  if (info) {
-    return res.status(200).json({ success: true, message: "Gain Table Saved" });
-  }
-  return res.status(200).json({ success: false, message: "Gain Table Not Saved Not" });
 });
 
 app.post('/api/run-filterA-test', (req, res) => {
@@ -652,7 +691,49 @@ app.post('/api/run-filterC-test', (req, res) => {
   });
 });
 
+app.post('/api/run-userGain-test', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const {mhagainparam, filterAparam, filterBparam, filterCparam} = req.body;
+  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Run_all.sh")
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test");
+  const mhagainparamWithQuotes = `'${mhagainparam}'`;
+  const filterAparamWithQuotes = `'${filterAparam}'`;
+  const filterBparamWithQuotes = `'${filterBparam}'`;
+  const filterCparamWithQuotes = `'${filterCparam}'`;
 
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes} ${filterAparamWithQuotes} ${filterBparamWithQuotes} ${filterCparamWithQuotes} ${0}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ success: false, message: 'Script execution failed', error });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ success: true, message: 'Script run all executed successfully', stdout, stderr });
+  });
+    });
+
+app.post('/api/run-userGain-All', (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const {mhagainparam, filterAparam, filterBparam, filterCparam, latency, participantId} = req.body;
+  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Run_all.sh")
+  const sourceAudioPath = path.join(__dirname, "/assets/stimulisentences");
+  const destAudioPath = path.join(__dirname, "/assets/stimulisentences_usertest/${participantId}");
+  const mhagainparamWithQuotes = `'${mhagainparam}'`;
+  const filterAparamWithQuotes = `'${filterAparam}'`;
+  const filterBparamWithQuotes = `'${filterBparam}'`;
+  const filterCparamWithQuotes = `'${filterCparam}'`;
+
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes} ${filterAparamWithQuotes} ${filterBparamWithQuotes} ${filterCparamWithQuotes} ${0}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ success: false, message: 'Script execution failed', error });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ success: true, message: 'Script run all executed successfully', stdout, stderr });
+  });
+    });
 async function runScript(scriptPath, sourcePath, destPath, param) {
   try {
     const { stdout, stderr } = await exec(`${scriptPath} ${sourcePath} ${destPath} ${param}`);
@@ -666,106 +747,42 @@ async function runScript(scriptPath, sourcePath, destPath, param) {
   }
 }
 
-app.post('/api/run-userGain-test', (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const {mhagainparam, filterAparam, filterBparam, filterCparam} = req.body;
-
-  const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_UserGain.sh");
-  const scriptPath_filterA = path.join(__dirname, "/assets/MHAconfigs/Test_FilterA.sh");
-  const scriptPath_filterB = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
-  const scriptPath_filterC = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
-
-  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-  const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_HApath.wav");
-
-  const sourceAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-  const destAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_Directpath.wav");
-
-  if (!mhagainparam || typeof mhagainparam !== 'string') {
-    return res.status(400).send({ message: 'Invalid parameter' });
-  }
-  const mhagainparamWithQuotes = `'${mhagainparam}'`;
-  const filterAparamWithQuotes = `'${filterAparam}'`;
-  const filterBparamWithQuotes = `'${filterBparam}'`;
-  const filterCparamWithQuotes = `'${filterCparam}'`;
-  try {
-    // HEARING AID PATH
-    await runScript(scriptPath, sourceAudioPath, destAudioPath, mhagainparamWithQuotes);
-    await runScript(scriptPath_filterB, destAudioPath, destAudioPath, filterBparamWithQuotes);
-    // DIRECT path
-    await runScript(scriptPath_filterA, sourceAudioPath_DIRECT, destAudioPath_DIRECT, filterAparamWithQuotes);
-    await runScript(scriptPath_filterC, destAudioPath_DIRECT, destAudioPath_DIRECT, filterCparamWithQuotes);
-
-    res.send({ success: true, message: 'Scripts executed successfully' });
-  } catch (error) {
-    res.status(500).send({ success: false, message: error.message });
-  }
-
-});
-
-
-
-// // Function to stream audio
-// function streamAudio(req, res, audioFilePath) {
-//   const stat = fs.statSync(audioFilePath);
-//   const fileSize = stat.size;
-//   const range = req.headers.range;
-//   if (range) {
-//     const parts = range.replace(/bytes=/, '').split('-');
-//     const start = parseInt(parts[0], 10);
-//     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-//     const chunksize = end - start + 1;
-//     const file = fs.createReadStream(audioFilePath, { start, end });
-//     const head = {
-//       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-//       'Accept-Ranges': 'bytes',
-//       'Content-Length': chunksize,
-//       'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//     };
-//     res.writeHead(206, head);
-//     file.pipe(res);
-//   } else {
-//     const head = {
-//       'Content-Length': fileSize,
-//       'Content-Type': 'audio/wav', // Adjust MIME type as needed
-//     };
-//     res.writeHead(200, head);
-//     fs.createReadStream(audioFilePath).pipe(res);
-//   }
-// }
+// app.post('/api/run-userGain-test', (req, res) => {
+//   const baseUrl = `${req.protocol}://${req.get("host")}`;
+//   const {mhagainparam, filterAparam, filterBparam, filterCparam} = req.body;
 //
-// // Watch for changes in the audio file
-// let audioStream = null; // Variable to store the audio stream
-// const filterAtestFilePath = path.join(__dirname, "/assets/test_sentence/filterA-test/stereo_ISTS.wav");
-// fs.watchFile(filterAtestFilePath, (curr, prev) => {
-//   if (curr.mtime > prev.mtime) {
-//     // The audio file has changed, close the existing audio stream if it exists
-//     if (audioStream) {
-//       audioStream.close();
-//       audioStream = null;
-//     }
-//     // Create a new audio stream
-//     audioStream = fs.createReadStream(filterAtestFilePath);
-//     console.log('Audio file has changed. Reloaded audio stream.');
+//   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_UserGain.sh");
+//   const scriptPath_filterA = path.join(__dirname, "/assets/MHAconfigs/Test_FilterA.sh");
+//   const scriptPath_filterB = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
+//   const scriptPath_filterC = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
+//
+//   const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+//   const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_HApath.wav");
+//
+//   const sourceAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
+//   const destAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_Directpath.wav");
+//
+//   if (!mhagainparam || typeof mhagainparam !== 'string') {
+//     return res.status(400).send({ message: 'Invalid parameter' });
 //   }
+//   const mhagainparamWithQuotes = `'${mhagainparam}'`;
+//   const filterAparamWithQuotes = `'${filterAparam}'`;
+//   const filterBparamWithQuotes = `'${filterBparam}'`;
+//   const filterCparamWithQuotes = `'${filterCparam}'`;
+//   try {
+//     // HEARING AID PATH
+//     await runScript(scriptPath, sourceAudioPath, destAudioPath, mhagainparamWithQuotes);
+//     await runScript(scriptPath_filterB, destAudioPath, destAudioPath, filterBparamWithQuotes);
+//     // DIRECT path
+//     await runScript(scriptPath_filterA, sourceAudioPath_DIRECT, destAudioPath_DIRECT, filterAparamWithQuotes);
+//     await runScript(scriptPath_filterC, destAudioPath_DIRECT, destAudioPath_DIRECT, filterCparamWithQuotes);
+//     res.send({ success: true, message: 'Scripts executed successfully' });
+//   } catch (error) {
+//     res.status(500).send({ success: false, message: error.message });
+//   }
+//
 // });
-//
-// app.get('/api/stream-filterA-audio', (req, res) => {
-//   if (audioStream) {
-//     // Pipe the audio stream to the response
-//     res.setHeader('Content-Type', 'audio/wav');
-//     audioStream.pipe(res);
-//   } else {
-//     // If no audio stream exists, create one and pipe it to the response
-//     audioStream = fs.createReadStream(filterAtestFilePath);
-//     audioStream.on('error', (err) => {
-//       console.error('Error creating audio stream:', err);
-//       res.status(500).send('Internal Server Error');
-//     });
-//     audioStream.pipe(res);
-//      res.setHeader('Content-Type', 'audio/wav');
-//   }
-//   });
+
 
 
 app.get("/api/get-all-user-study", (req, res) => {

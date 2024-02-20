@@ -51,6 +51,9 @@ const GetFilterBById = (id) => {
 const GetFilterCById = (id) => {
   return RestClient.Get(`http://localhost:3001/api/get-filterC-id/${id}`);
 };
+const GetUserGainById = (id) => {
+  return RestClient.Get(`http://localhost:3001/api/get-usergain-id/${id}`);
+};
 
 const Login = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/login`, payload);
@@ -96,6 +99,7 @@ const exportedObject = {
   GetFilterAById,
   GetFilterBById,
   GetFilterCById,
+  GetUserGainById,
   Login,
   Register,
   GetAllFiles,

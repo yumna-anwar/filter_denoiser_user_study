@@ -22,14 +22,14 @@ USERGAIN_CFG="$SCRIPT_DIR/UserGain.cfg"
 mkdir -p "$2"
 
 # APPLY USER GAIN
-for file in "$1"/*
+for file in "$1"/*.wav
 do
 	echo $file
 	fnameout_HApath1="$2/HApath1_$(basename "$file")"
 	fnameout_HApath2="$2/HApath2_$(basename "$file")"
 	fnameout_Directpath1="$2/Directpath1_$(basename "$file")"
 	fnameout_Directpath2="$2/Directpath2_$(basename "$file")"
-	fnameout_Combinedpath="$2/Combined_$(basename "$file")"
+	fnameout_Combinedpath="$2/Combined_$7_$(basename "$file")"
 	echo $fnameout_HApath
 	echo $fnameout_Directpath
 	echo $fnameout_Combinedpath
@@ -39,8 +39,9 @@ do
 
 	mha ?read:$FILTERA_CFG mha.overlapadd.mhachain.dc.gtdata="$4" io.in="$file" io.out="$fnameout_Directpath1" cmd=start cmd=quit
 	mha ?read:$FILTERC_CFG mha.overlapadd.mhachain.dc.gtdata="$6" io.in="$fnameout_Directpath1" io.out="$fnameout_Directpath2" cmd=start cmd=quit
-	python add_latency.py $fnameout_HApath2 $fnameout_Directpath2 $fnameout_Combinedpath $7
+	python assets/MHAconfigs/add_latency.py $fnameout_HApath2 $fnameout_Directpath2 $fnameout_Combinedpath $7
 done
 
 
 #./Run_all.sh /Users/yumnaanwar/Desktop/filter_denoiser_user_study/server/assets/stimulisentences /Users/yumnaanwar/Desktop/filter_denoiser_user_study/server/assets/stimulisentences_usertest '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' 10
+

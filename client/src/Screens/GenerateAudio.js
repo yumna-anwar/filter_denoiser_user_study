@@ -18,7 +18,84 @@ const GenerateAudio = () => {
   const navigate = useNavigate();
   const [participantIds, setParticipantsIds] = useState([]); // List of user IDs
   const [participantId, setParticipantId] = useState(""); // Selected user ID
+  const [oldfiltersA, setOldfiltersA] = useState([]);
+  const [oldfiltersB, setOldfiltersB] = useState([]);
+  const [oldfiltersC, setOldfiltersC] = useState([]);
+  const [filterIdA, setFilterIdA] = useState('');
+  const [filterIdB, setFilterIdB] = useState('');
+  const [filterIdC, setFilterIdC] = useState('');
+  const [filterAgtable, setFilterAgtable] = useState('');
+  const [filterBgtable, setFilterBgtable] = useState('');
+  const [filterCgtable, setFilterCgtable] = useState('');
 
+
+  useEffect(() => {
+    fetchfilter("A");
+    fetchfilter("B");
+    fetchfilter("C");
+    fetchParticipantIds();
+  }, []);
+
+  const fetchParticipantIds = async () => {
+    try {
+      const response = await CommonService.GetUserGain();
+      if (response.success) {
+        const data = response.data;
+        const ids = Object.values(data).map(user => user.participantID);
+        setParticipantsIds(ids);
+      } else {
+        console.error("Failed to fetch user IDs");
+        // setgainvaluesString("Failed to fetch user IDs")
+      }
+    } catch (error) {
+      console.error("Error fetching user IDs:", error);
+    }
+  };
+
+  const fetchfilter = async (filterType) => {
+    try {
+      let response;
+      if (filterType=="A"){
+        response = await CommonService.GetFilterA();
+        //toast.success("Filter A Found");
+      } else if (filterType=="B"){
+        response = await CommonService.GetFilterB();
+        //toast.success("Filter B Found");
+      }else if (filterType=="C"){
+        response = await CommonService.GetFilterC();
+        //toast.success("Filter C Found");
+      }else{
+        toast.error("Filter not identified");
+        response = await CommonService.GetFilterA();
+      }
+
+      if (response.success) {
+        const data = response.data;
+        const userIDsAndDates = data.map(entry => ({
+          sno: entry.sno,
+          userId: entry.UserId,
+          date: entry.date
+        }));
+
+        if (filterType=="A"){
+          setOldfiltersA(userIDsAndDates)
+        } else if (filterType=="B"){
+          setOldfiltersB(userIDsAndDates)
+        }else if (filterType=="C"){
+          setOldfiltersC(userIDsAndDates)
+        }else{
+          toast.error("Filter not identified");
+          response = await CommonService.GetFilterA();
+        }
+
+      } else {
+        console.error("Failed to fetch filters");
+        // setgainvaluesString("Failed to fetch user IDs")
+      }
+    } catch (error) {
+      console.error("Error fetching user filters:", error);
+    }
+  };
 
 const handlePlayPauseAudio = () => {
     const audioElement = audioRef.current;
@@ -89,11 +166,90 @@ const handlePlayPauseAudio = () => {
     }
   };
 
+  const handleFilterSelection = async (e, filterType) => {
+    const newFilterId = e.target.value;
+    setFilterIdA(newFilterId)
+    let response;
+    if (filterType=="A"){
+       response = await CommonService.GetFilterAById(newFilterId);
+
+       setFilterAgtable(response.data.gtable)
+    } else if (filterType=="B"){
+       response = await CommonService.GetFilterBById(newFilterId);
+       setFilterBgtable(response.data.gtable)
+    }else if (filterType=="C"){
+       response = await CommonService.GetFilterCById(newFilterId);
+       setFilterCgtable(response.data.gtable)
+    }else{
+      toast.error("Filter not identified");
+    }
+
+    const data = response.data
+    toast.success(data.gtable);
+    };
+
+    const handleSubmit = async (e) => {
+      //console.log('Attempting to submit form');
+      e.preventDefault(); // Prevent default form submission behavior
+
+      };
+
   return (
   <>
-    <Header showExitBtn={true}/>
+    <Header showBackBtn={true}/>
 
     <div className={styles.centeringContainer}>
+    <form onSubmit={handleSubmit} className={styles.formLayout}>
+
+    <div className={styles.inlineGroup}>
+        <label htmlFor="userId">Load Filter A:</label>
+        <select
+          id="filterIdA"
+          value={filterIdA}
+          onChange={(e) => handleFilterSelection(e, 'A')}
+        >
+          <option value="">Load Filter A</option>
+          {oldfiltersA.map(({ sno, userId, date }) => (
+            <option key={sno} value={sno}>
+              {`${sno} - ${userId} - ${date}`}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p>Selected Filter A gain table: {filterAgtable}</p>
+      <div className={styles.inlineGroup}>
+          <label htmlFor="userId">Load Filter B:</label>
+          <select
+            id="filterIdB"
+            value={filterIdB}
+            onChange={(e) => handleFilterSelection(e, 'B')}
+          >
+            <option value="">Load Filter B</option>
+            {oldfiltersB.map(({ sno, userId, date }) => (
+              <option key={sno} value={sno}>
+                {`${sno} - ${userId} - ${date}`}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p>Selected Filter B gain table: {filterBgtable}</p>
+        <div className={styles.inlineGroup}>
+            <label htmlFor="userId">Load Filter C:</label>
+            <select
+              id="filterIdC"
+              value={filterIdC}
+              onChange={(e) => handleFilterSelection(e, 'C')}
+            >
+              <option value="">Load Filter C</option>
+              {oldfiltersC.map(({ sno, userId, date }) => (
+                <option key={sno} value={sno}>
+                  {`${sno} - ${userId} - ${date}`}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p>Selected Filter C gain table: {filterCgtable}</p>
+          <br />
     <div className={styles.inlineGroup}>
         <label htmlFor="participantId">Select Participant:</label>
         <select
@@ -109,6 +265,13 @@ const handlePlayPauseAudio = () => {
           ))}
         </select>
       </div>
+
+
+      <button type="submit" name="save"
+      className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
+      style={{ width: "180px", height: "55px" }}>Generate Audio</button>
+
+        </form>
     </div>
 
   </>

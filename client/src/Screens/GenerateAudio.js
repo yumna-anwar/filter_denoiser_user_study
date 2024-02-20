@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Header from "../Components/Header";
+import FilesModal from '../Components/FilesModal';
 import styles from '../Components/FilterCentering.module.css';
 import CommonService from "../Services/Common/CommonService";
 import Play from "../Assests/Images/play.svg";
@@ -13,6 +14,7 @@ const GenerateAudio = () => {
   const userId = useSelector((state) => state.CommonReducer.userId);
   const audioRef = useRef(null);
   const [volume, setVolume] = useState(0.5);
+  const [latency, setLatency] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [replayAudio, setReplayAudio] = useState(false);
   const navigate = useNavigate();
@@ -24,10 +26,11 @@ const GenerateAudio = () => {
   const [filterIdA, setFilterIdA] = useState('');
   const [filterIdB, setFilterIdB] = useState('');
   const [filterIdC, setFilterIdC] = useState('');
+  const [filterUsergtable, setFilterUsergtable] = useState('');
   const [filterAgtable, setFilterAgtable] = useState('');
   const [filterBgtable, setFilterBgtable] = useState('');
   const [filterCgtable, setFilterCgtable] = useState('');
-
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     fetchfilter("A");
@@ -85,7 +88,6 @@ const GenerateAudio = () => {
           setOldfiltersC(userIDsAndDates)
         }else{
           toast.error("Filter not identified");
-          response = await CommonService.GetFilterA();
         }
 
       } else {
@@ -97,74 +99,19 @@ const GenerateAudio = () => {
     }
   };
 
-const handlePlayPauseAudio = () => {
-    const audioElement = audioRef.current;
-    if (audioElement) {
-      if (isPlaying) {
-        audioElement.pause(); // Pause audio playback
-        //setlogString("Audio Paused");
-        toast.success("Audio Paused");
-      } else {
-        audioElement.volume=0.5
-        audioElement.play(); // Start audio playback
-        //setlogString("Audio Playing");
-        toast.success("Audio Playing");
-      }
-      setIsPlaying(!isPlaying); // Toggle the play state
+
+  const handleUsergainSelection = async (e) => {
+    const newParticipantId = e.target.value;
+    setParticipantId(newParticipantId);
+    const response = await CommonService.GetUserGainById(newParticipantId);
+
+    if (response.success) {
+      setFilterUsergtable(response.data.gtable)
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
     }
-  };
-
-
-  const handleReplayAudio = () => {
-    const audioElement = audioRef.current;
-    if (audioElement) {
-      // Pause the audio if it's currently playing
-      if (isPlaying) {
-        audioElement.pause();
-      }
-
-      // Set the audio source URL with a unique query parameter
-      const audioSourceUrl = "http://localhost:3001/assets/test_sentence/filterA-test/stereo_ISTS.wav";
-      const uniqueUrl = audioSourceUrl + "?t=" + Date.now(); // Append current timestamp as query parameter
-      audioElement.src = uniqueUrl;
-
-      // Load and play the audio
-      audioElement.load();
-      audioElement.volume=0.5
-      audioElement.play()
-
-      // Set the audio playback time to the beginning
-      audioElement.currentTime = 0;
-      audioElement.play()
-        .then(() => {
-          setIsPlaying(true); // Update isPlaying state
-          //setlogString("Audio Reloaded");
-          toast.success("Audio Reloaded");
-        })
-        .catch((error) => {
-          //setlogString("Error playing audio:" + error.message);
-          toast.success(error.message);
-        });
-      }
     };
-
-  useEffect(() => {
-    // When replayAudio becomes true, reset it to false and play the audio
-    if (replayAudio) {
-      handleReplayAudio(); // Call the replay function directly
-      setReplayAudio(false); // Reset replayAudio
-    }
-  }, [replayAudio]);
-
-  const handleVolumeChange = (e) => {
-    setVolume(parseFloat(e.target.value));
-    const audioElement = audioRef.current;
-    if (audioElement) {
-      audioElement.volume = parseFloat(e.target.value);
-      //setlogString("Volume changed to:" + e.target.value);
-      toast.success("Volume changed to: " + e.target.value);
-    }
-  };
 
   const handleFilterSelection = async (e, filterType) => {
     const newFilterId = e.target.value;
@@ -191,7 +138,26 @@ const handlePlayPauseAudio = () => {
     const handleSubmit = async (e) => {
       //console.log('Attempting to submit form');
       e.preventDefault(); // Prevent default form submission behavior
+      try {
+        //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
 
+        var payload = {
+          mhagainparam: filterUsergtable,
+          filterAparam: filterAgtable,
+          filterBparam: filterBgtable,
+          filterCparam: filterBgtable,
+          latency: latency,
+          participantId: participantId
+
+        };
+        toast.success(payload)
+        const response = await CommonService.RunUserGainAll(payload);
+
+        toast.success(response.message)
+      } catch (error) {
+        console.error('Error:', error);
+        toast.success( error.message)
+      }
       };
 
   return (
@@ -255,7 +221,7 @@ const handlePlayPauseAudio = () => {
         <select
           id="participantId"
           value={participantId}
-          onChange={(e) => setParticipantId(e.target.value)}
+          onChange={(e) => handleUsergainSelection(e)}
         >
           <option value="">Select Participant ID</option>
           {participantIds.map((id) => (
@@ -265,13 +231,31 @@ const handlePlayPauseAudio = () => {
           ))}
         </select>
       </div>
+      <p>Selected User HA gain table: {filterUsergtable}</p>
 
+      <div className={styles.inlineGroup}>
+        <label htmlFor="stepSize">Latency (ms):</label>
+        <input
+          id="latency"
+          type="number"
+          value={latency}
+          onChange={(e) => setLatency(e.target.value)}
+          min="1"
+        />
+      </div>
 
       <button type="submit" name="save"
       className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
       style={{ width: "180px", height: "55px" }}>Generate Audio</button>
 
+      <div className={styles.inlineGroup}>
+      <button onClick={() => setModalOpen(true)}>View Data</button>
+      <FilesModal isOpen={modalOpen} onClose={() => setModalOpen(false)} participantId={participantId} />
+      </div>
+
         </form>
+
+
     </div>
 
   </>

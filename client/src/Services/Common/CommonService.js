@@ -12,6 +12,9 @@ const RunFilterCtest = (payload) => {
 const RunUserGaintest = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/run-userGain-test`, payload);
 };
+const RunUserGainAll = (payload) => {
+  return RestClient.Post(`http://localhost:3001/api/run-userGain-All`, payload);
+};
 
 
 const AddFilterA = (payload) => {
@@ -54,6 +57,9 @@ const GetFilterCById = (id) => {
 const GetUserGainById = (id) => {
   return RestClient.Get(`http://localhost:3001/api/get-usergain-id/${id}`);
 };
+const GetAllFilesId = (id) => {
+  return RestClient.Get(`http://localhost:3001/api/list-files-userid/${id}`);
+};
 
 const Login = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/login`, payload);
@@ -88,6 +94,7 @@ const exportedObject = {
   RunFilterBtest,
   RunFilterCtest,
   RunUserGaintest,
+  RunUserGainAll,
   AddFilterA,
   AddFilterB,
   AddFilterC,
@@ -102,6 +109,7 @@ const exportedObject = {
   GetUserGainById,
   Login,
   Register,
+  GetAllFilesId,
   GetAllFiles,
   AddUserStudy,
   GetAllUserStudy,

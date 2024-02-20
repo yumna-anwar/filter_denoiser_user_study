@@ -173,26 +173,44 @@ app.get("/api/list-files", (req, res) => {
       const fileData = [];
 
       files.forEach((file) => {
-        const filePath = path.join(assetsFolder, file);
         const fileUrl = `${baseUrl}/assets/stimulisentences/${file}`; // Construct the URL
         fileData.push({ path: fileUrl, file });
       });
-
       const compareStrings = (a, b) => {
         a = a.toLowerCase();
         b = b.toLowerCase();
         return a < b ? -1 : a > b ? 1 : 0;
       };
-
       var sortedData = fileData.sort(function (a, b) {
         return compareStrings(a.file, b.file);
       });
-
       res.json({ success: true, fileData: sortedData });
     }
   });
 });
+app.get("/api/list-files-userid/:id", (req, res) => {
+  const participantId = req.params.id;
+  const assetsFolder = path.join(__dirname, `assets/stimulisentences_usertest/${participantId}`); // Replace 'assets' with your folder name
+  const baseUrl = `${req.protocol}://${req.get("host")}`; // Construct the base URL
 
+  fs.readdir(assetsFolder, (err, files) => {
+    if (err) {
+      console.error(err);
+      res.status(200).json({ success: false, message: "Error reading files" });
+    } else {
+      const fileData = [];
+
+      files.forEach((file) => {
+        const filePath = path.join(assetsFolder, file);
+        const fileUrl = `${baseUrl}/assets/stimulisentences_usertest/${participantId}/${file}`; // Construct the URL
+        //fileData.push({ path: fileUrl, file });
+        fileData.push(file);
+      });
+      //const sortedData = fileData.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      res.json({ success: true, message:"File reading Successful",fileData: fileData });
+    }
+  });
+});
 app.post("/api/add-user-study", (req, res) => {
   const { UserId, FileName, Rate, Guid } = req.body;
 
@@ -718,13 +736,13 @@ app.post('/api/run-userGain-All', (req, res) => {
   const {mhagainparam, filterAparam, filterBparam, filterCparam, latency, participantId} = req.body;
   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Run_all.sh")
   const sourceAudioPath = path.join(__dirname, "/assets/stimulisentences");
-  const destAudioPath = path.join(__dirname, "/assets/stimulisentences_usertest/${participantId}");
+  const destAudioPath = path.join(__dirname, `/assets/stimulisentences_usertest/${participantId}`);
   const mhagainparamWithQuotes = `'${mhagainparam}'`;
   const filterAparamWithQuotes = `'${filterAparam}'`;
   const filterBparamWithQuotes = `'${filterBparam}'`;
   const filterCparamWithQuotes = `'${filterCparam}'`;
 
-  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes} ${filterAparamWithQuotes} ${filterBparamWithQuotes} ${filterCparamWithQuotes} ${0}`, (error, stdout, stderr) => {
+  exec(`${scriptPath} ${sourceAudioPath} ${destAudioPath} ${mhagainparamWithQuotes} ${filterAparamWithQuotes} ${filterBparamWithQuotes} ${filterCparamWithQuotes} ${latency}`, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send({ success: false, message: 'Script execution failed', error });
@@ -734,6 +752,8 @@ app.post('/api/run-userGain-All', (req, res) => {
     res.send({ success: true, message: 'Script run all executed successfully', stdout, stderr });
   });
     });
+
+
 async function runScript(scriptPath, sourcePath, destPath, param) {
   try {
     const { stdout, stderr } = await exec(`${scriptPath} ${sourcePath} ${destPath} ${param}`);

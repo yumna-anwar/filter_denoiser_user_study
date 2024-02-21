@@ -20,7 +20,7 @@ const Dashboard = () => {
           <div><button
             className="button btn btn-lg btn-success"
             type="button"
-            onClick={() => navigate("user-study")}
+            onClick={() => navigate("select-user-study")}
           >
             Start User Study
           </button></div>

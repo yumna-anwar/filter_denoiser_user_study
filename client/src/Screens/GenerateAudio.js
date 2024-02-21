@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from 'react-toastify';
 import Header from "../Components/Header";
 import FilesModal from '../Components/FilesModal';
+import SpinnerModal from '../Components/SpinnerModal';
 import styles from '../Components/FilterCentering.module.css';
 import CommonService from "../Services/Common/CommonService";
 import Play from "../Assests/Images/play.svg";
@@ -31,6 +32,7 @@ const GenerateAudio = () => {
   const [filterBgtable, setFilterBgtable] = useState('');
   const [filterCgtable, setFilterCgtable] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchfilter("A");
@@ -115,16 +117,19 @@ const GenerateAudio = () => {
 
   const handleFilterSelection = async (e, filterType) => {
     const newFilterId = e.target.value;
-    setFilterIdA(newFilterId)
+
     let response;
     if (filterType=="A"){
+        setFilterIdA(newFilterId)
        response = await CommonService.GetFilterAById(newFilterId);
 
        setFilterAgtable(response.data.gtable)
     } else if (filterType=="B"){
+      setFilterIdB(newFilterId)
        response = await CommonService.GetFilterBById(newFilterId);
        setFilterBgtable(response.data.gtable)
     }else if (filterType=="C"){
+      setFilterIdC(newFilterId)
        response = await CommonService.GetFilterCById(newFilterId);
        setFilterCgtable(response.data.gtable)
     }else{
@@ -138,26 +143,32 @@ const GenerateAudio = () => {
     const handleSubmit = async (e) => {
       //console.log('Attempting to submit form');
       e.preventDefault(); // Prevent default form submission behavior
-      try {
-        //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
+      const action = e.nativeEvent.submitter.name;
+      if (action === 'save') {
 
-        var payload = {
-          mhagainparam: filterUsergtable,
-          filterAparam: filterAgtable,
-          filterBparam: filterBgtable,
-          filterCparam: filterBgtable,
-          latency: latency,
-          participantId: participantId
+        setIsLoading(true);
+        try {
+          //const mhagainparam = '['+multipliedStringR+multipliedStringL.slice(0, -1)+']'
 
-        };
-        toast.success(payload)
-        const response = await CommonService.RunUserGainAll(payload);
+          var payload = {
+            mhagainparam: filterUsergtable,
+            filterAparam: filterAgtable,
+            filterBparam: filterBgtable,
+            filterCparam: filterBgtable,
+            latency: latency,
+            participantId: participantId
 
-        toast.success(response.message)
-      } catch (error) {
-        console.error('Error:', error);
-        toast.success( error.message)
+          };
+          const response = await CommonService.RunUserGainAll(payload);
+          toast.success(response.message)
+        } catch (error) {
+          console.error('Error:', error);
+          toast.success( error.message)
+        }finally {
+        setIsLoading(false); // Stop loading
       }
+      }
+
       };
 
   return (
@@ -240,13 +251,22 @@ const GenerateAudio = () => {
           type="number"
           value={latency}
           onChange={(e) => setLatency(e.target.value)}
-          min="1"
+          min="0"
         />
       </div>
 
+
       <button type="submit" name="save"
       className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
-      style={{ width: "180px", height: "55px" }}>Generate Audio</button>
+      style={{ width: "180px", height: "55px" }}>{isLoading ? 'Processing...' : 'Click Me'}</button>
+      
+      <SpinnerModal isOpen={isLoading}>
+        <div className={styles.modalheader}>Processing...</div>
+        <div className={styles.modalbody}>
+          <div className={styles.loader}></div>
+        </div>
+      </SpinnerModal>
+
 
       <div className={styles.inlineGroup}>
       <button onClick={() => setModalOpen(true)}>View Data</button>

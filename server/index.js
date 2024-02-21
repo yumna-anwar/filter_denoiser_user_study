@@ -19,12 +19,20 @@ app.use(
   express.static(path.join(__dirname, "assets/stimulisentences"))
 );
 app.use(
+  "/assets/_stimulisentences",
+  express.static(path.join(__dirname, "assets/_stimulisentences"))
+);
+app.use(
   "/assets/test_sentence",
   express.static(path.join(__dirname, "assets/test_sentence"))
 );
 app.use(
   "/assets/MHAconfigs",
   express.static(path.join(__dirname, "assets/MHAconfigs"))
+);
+app.use(
+  "/assets/stimulisentences_usertest",
+  express.static(path.join(__dirname, "assets/stimulisentences_usertest"))
 );
 
 app.get("/api/get-all-user", (req, res) => {
@@ -162,7 +170,7 @@ app.post("/api/register", (req, res) => {
 
 // ASSESTS/USERID/MODELNAME_SNR_SENTENCENAME.WAV
 app.get("/api/list-files", (req, res) => {
-  const assetsFolder = path.join(__dirname, "assets/stimulisentences"); // Replace 'assets' with your folder name
+  const assetsFolder = path.join(__dirname, "assets/_stimulisentences"); // Replace 'assets' with your folder name
   const baseUrl = `${req.protocol}://${req.get("host")}`; // Construct the base URL
 
   fs.readdir(assetsFolder, (err, files) => {
@@ -173,8 +181,39 @@ app.get("/api/list-files", (req, res) => {
       const fileData = [];
 
       files.forEach((file) => {
-        const fileUrl = `${baseUrl}/assets/stimulisentences/${file}`; // Construct the URL
+        const fileUrl = `${baseUrl}/assets/_stimulisentences/${file}`; // Construct the URL
         fileData.push({ path: fileUrl, file });
+      });
+      const compareStrings = (a, b) => {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        return a < b ? -1 : a > b ? 1 : 0;
+      };
+      var sortedData = fileData.sort(function (a, b) {
+        return compareStrings(a.file, b.file);
+      });
+      res.json({ success: true, fileData: sortedData });
+    }
+  });
+});
+app.get("/api/list-files-user/:id", (req, res) => {
+  const participantId = req.params.id;
+  const keyword = "Combined_";
+  const assetsFolder = path.join(__dirname, `assets/stimulisentences_usertest/${participantId}`); // Replace 'assets' with your folder name
+  const baseUrl = `${req.protocol}://${req.get("host")}`; // Construct the base URL
+
+  fs.readdir(assetsFolder, (err, files) => {
+    if (err) {
+      console.error(err);
+      res.status(200).json({ success: false, message: "Error reading files" });
+    } else {
+      const fileData = [];
+
+      files.forEach((file) => {
+        if (file.startsWith(keyword)) {
+        const fileUrl = `${baseUrl}/assets/stimulisentences_usertest/${participantId}/${file}`; // Construct the URL
+        fileData.push({ path: fileUrl, file });
+        }
       });
       const compareStrings = (a, b) => {
         a = a.toLowerCase();
@@ -211,6 +250,22 @@ app.get("/api/list-files-userid/:id", (req, res) => {
     }
   });
 });
+
+app.get("/api/list-directories", (req, res) => {
+  const basePath = path.join(__dirname, `assets/stimulisentences_usertest/`); // Adjust path as needed
+  fs.readdir(basePath, { withFileTypes: true }, (err, entries) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: "Error reading directory" });
+    }
+    const directories = entries
+      .filter(entry => entry.isDirectory())
+      .map(dir => dir.name);
+    res.json({ success: true, message: "Directories fetched successfully", directories: directories });
+  });
+});
+
+
 app.post("/api/add-user-study", (req, res) => {
   const { UserId, FileName, Rate, Guid } = req.body;
 
@@ -727,7 +782,7 @@ app.post('/api/run-userGain-test', (req, res) => {
     }
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
-    res.send({ success: true, message: 'Script run all executed successfully', stdout, stderr });
+    res.send({ success: true, message: 'Script user gain executed successfully', stdout, stderr });
   });
     });
 

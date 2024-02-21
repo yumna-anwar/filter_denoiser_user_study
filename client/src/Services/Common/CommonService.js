@@ -60,6 +60,9 @@ const GetUserGainById = (id) => {
 const GetAllFilesId = (id) => {
   return RestClient.Get(`http://localhost:3001/api/list-files-userid/${id}`);
 };
+const GetAllDirectories = (payload) => {
+  return RestClient.Get(`http://localhost:3001/api/list-directories`);
+};
 
 const Login = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/login`, payload);
@@ -71,6 +74,9 @@ const Register = (payload) => {
 
 const GetAllFiles = (payload) => {
   return RestClient.Get(`http://localhost:3001/api/list-files`);
+};
+const GetAllFilesUser = (id) => {
+  return RestClient.Get(`http://localhost:3001/api/list-files-user/${id}`);
 };
 
 const AddUserStudy = (payload) => {
@@ -110,7 +116,9 @@ const exportedObject = {
   Login,
   Register,
   GetAllFilesId,
+  GetAllFilesUser,
   GetAllFiles,
+  GetAllDirectories,
   AddUserStudy,
   GetAllUserStudy,
   GetAllUsers,

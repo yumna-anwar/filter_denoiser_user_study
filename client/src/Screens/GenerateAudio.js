@@ -258,8 +258,8 @@ const GenerateAudio = () => {
 
       <button type="submit" name="save"
       className={`button btn btn-lg btn-success play mb-3 ${styles.playButton}`}
-      style={{ width: "180px", height: "55px" }}>{isLoading ? 'Processing...' : 'Click Me'}</button>
-      
+      style={{ width: "180px", height: "55px" }}>{isLoading ? 'Processing...' : 'Generate Audio'}</button>
+
       <SpinnerModal isOpen={isLoading}>
         <div className={styles.modalheader}>Processing...</div>
         <div className={styles.modalbody}>

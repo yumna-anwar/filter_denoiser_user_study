@@ -725,8 +725,8 @@ app.post('/api/run-filterB-test', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   const {mhagainparam} = req.body;
   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
-  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterB-test/stereo_ISTS.wav");
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_Pink_Noise.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterB-test/stereo_Pink_Noise.wav");
   if (!mhagainparam || typeof mhagainparam !== 'string') {
     return res.status(400).send({ message: 'Invalid parameter' });
   }
@@ -746,8 +746,8 @@ app.post('/api/run-filterC-test', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   const {mhagainparam} = req.body;
   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
-  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterC-test/stereo_ISTS.wav");
+  const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_Pink_Noise.wav");
+  const destAudioPath = path.join(__dirname, "/assets/test_sentence/filterC-test/stereo_Pink_Noise.wav");
   if (!mhagainparam || typeof mhagainparam !== 'string') {
     return res.status(400).send({ message: 'Invalid parameter' });
   }

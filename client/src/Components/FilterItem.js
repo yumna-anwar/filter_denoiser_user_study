@@ -208,7 +208,7 @@ const handleSubmit = async (e) => {
         //setlogString("Audio Paused");
         toast.success("Audio Paused");
       } else {
-        audioElement.volume=0.5
+        audioElement.volume=parseFloat(volume, 10);
         audioElement.play(); // Start audio playback
         //setlogString("Audio Playing");
         toast.success("Audio Playing");
@@ -227,13 +227,23 @@ const handleSubmit = async (e) => {
       }
 
       // Set the audio source URL with a unique query parameter
-      const audioSourceUrl = "http://localhost:3001/assets/test_sentence/filter"+filterType+"-test/stereo_ISTS.wav";
+      let audioSourceUrl;
+      if (filterType=="A"){
+         audioSourceUrl = "http://localhost:3001/assets/test_sentence/filter"+filterType+"-test/stereo_ISTS.wav";
+      } else if (filterType=="B"){
+         audioSourceUrl = "http://localhost:3001/assets/test_sentence/filter"+filterType+"-test/stereo_Pink_Noise.wav";
+      }else if (filterType=="C"){
+         audioSourceUrl = "http://localhost:3001/assets/test_sentence/filter"+filterType+"-test/stereo_Pink_Noise.wav";
+      }else{
+         audioSourceUrl = "http://localhost:3001/assets/test_sentence/filter"+filterType+"-test/stereo_ISTS.wav";
+      }
+
       const uniqueUrl = audioSourceUrl + "?t=" + Date.now(); // Append current timestamp as query parameter
       audioElement.src = uniqueUrl;
 
       // Load and play the audio
       audioElement.load();
-      audioElement.volume=0.5
+      audioElement.volume=parseFloat(volume, 10);
       audioElement.play()
 
       // Set the audio playback time to the beginning
@@ -349,7 +359,15 @@ const handleSubmit = async (e) => {
           /></button>
 
           <audio ref={audioRef} >
+          {filterType === "A" ? (
             <source src={`http://localhost:3001/assets/test_sentence/filter${filterType}-test/stereo_ISTS.wav`} type="audio/wav" />
+            ) : filterType === "B" ?(
+          <source src={`http://localhost:3001/assets/test_sentence/filter${filterType}-test/stereo_Pink_Noise.wav`} type="audio/wav" />
+          ):filterType === "C" ?(
+          <source src={`http://localhost:3001/assets/test_sentence/filter${filterType}-test/stereo_Pink_Noise.wav`} type="audio/wav" />
+          ): (
+          <source src={`http://localhost:3001/assets/test_sentence/filter${filterType}-test/stereo_ISTS.wav`} type="audio/wav" />
+          )}
             Your browser does not support the audio element.
           </audio>
           </div>

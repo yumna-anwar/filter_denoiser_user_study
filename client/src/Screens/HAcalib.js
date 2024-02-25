@@ -86,6 +86,7 @@ const HAcalib = () => {
 
         if (filterType=="A"){
           setOldfiltersA(userIDsAndDates)
+          setVolume(data.volume)
         } else if (filterType=="B"){
           setOldfiltersB(userIDsAndDates)
         }else if (filterType=="C"){
@@ -228,7 +229,7 @@ const handlePlayPauseAudio = () => {
         audioElement.pause(); // Pause audio playback
         toast.success("Audio Paused");
       } else {
-        audioElement.volume=0.5
+        audioElement.volume=parseFloat(volume, 10);
         audioElement.play(); // Start audio playback
         toast.success("Audio Playing");
       }
@@ -250,7 +251,7 @@ const handlePlayPauseAudio = () => {
 
       // Load and play the audio
       audioElement.load();
-      audioElement.volume=0.5
+      audioElement.volume=parseFloat(volume, 10);
       audioElement.play()
 
       // Set the audio playback time to the beginning
@@ -300,7 +301,7 @@ const handlePlayPauseAudio = () => {
       setStepSize(2);
       setrginputValues([0,0,0,0,0,0,0,0])
       setlginputValues([0,0,0,0,0,0,0,0])
-      setVolume(0.5)
+      //setVolume(0.5)
       toast.error(response.message);
     }
     };
@@ -311,8 +312,8 @@ const handlePlayPauseAudio = () => {
       let response;
       if (filterType=="A"){
          response = await CommonService.GetFilterAById(newFilterId);
-
          setFilterAgtable(response.data.gtable)
+         setVolume(response.data.volume)
       } else if (filterType=="B"){
          response = await CommonService.GetFilterBById(newFilterId);
          setFilterBgtable(response.data.gtable)

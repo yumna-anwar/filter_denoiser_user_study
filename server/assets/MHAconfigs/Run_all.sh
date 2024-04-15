@@ -34,14 +34,13 @@ do
 	echo $fnameout_Directpath
 	echo $fnameout_Combinedpath
 
-	mha ?read:$USERGAIN_CFG mha.overlapadd.mhachain.dc.gtdata="$3" io.in="$file" io.out="$fnameout_HApath1" cmd=start cmd=quit
-	mha ?read:$FILTERB_CFG mha.overlapadd.mhachain.dc.gtdata="$5" io.in="$fnameout_HApath1" io.out="$fnameout_HApath2" cmd=start cmd=quit
+	mha ?read:$USERGAIN_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$3" io.in="$file" io.out="$fnameout_HApath1" cmd=start cmd=quit
+	mha ?read:$FILTERB_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$5" io.in="$fnameout_HApath1" io.out="$fnameout_HApath2" cmd=start cmd=quit
 
-	mha ?read:$FILTERA_CFG mha.overlapadd.mhachain.dc.gtdata="$4" io.in="$file" io.out="$fnameout_Directpath1" cmd=start cmd=quit
-	mha ?read:$FILTERC_CFG mha.overlapadd.mhachain.dc.gtdata="$6" io.in="$fnameout_Directpath1" io.out="$fnameout_Directpath2" cmd=start cmd=quit
+	mha ?read:$FILTERA_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$4" io.in="$file" io.out="$fnameout_Directpath1" cmd=start cmd=quit
+	mha ?read:$FILTERC_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$6" io.in="$fnameout_Directpath1" io.out="$fnameout_Directpath2" cmd=start cmd=quit
 	python assets/MHAconfigs/add_latency.py $fnameout_HApath2 $fnameout_Directpath2 $fnameout_Combinedpath $7
 done
 
 
 #./Run_all.sh /Users/yumnaanwar/Desktop/filter_denoiser_user_study/server/assets/stimulisentences /Users/yumnaanwar/Desktop/filter_denoiser_user_study/server/assets/stimulisentences_usertest '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' '[[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0];[0 0]]' 10
-

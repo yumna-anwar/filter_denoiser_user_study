@@ -178,7 +178,7 @@ const HAcalib = () => {
         mhagainparam: mhagainparam,
         filterAparam: filterAgtable,
         filterBparam: filterBgtable,
-        filterCparam: filterBgtable
+        filterCparam: filterCgtable
       };
       const response = await CommonService.RunUserGaintest(payload);
       toast.success(response.message)

@@ -154,7 +154,7 @@ const GenerateAudio = () => {
             mhagainparam: filterUsergtable,
             filterAparam: filterAgtable,
             filterBparam: filterBgtable,
-            filterCparam: filterBgtable,
+            filterCparam: filterCgtable,
             latency: latency,
             participantId: participantId
 

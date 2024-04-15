@@ -1,0 +1,12 @@
+Model,Borda_Count
+h24d5 transfer on grocery_store,2410
+h48d5 transfer on grocery_store,2378
+h48d5 trained on all,1990
+h12d5 transfer on grocery_store,864
+h24d5 trained on all,736
+h8d5 transfer on grocery_store,662
+h8d5 trained on all,-788
+h12d5 trained on all,-978
+h4d5 transfer on grocery_store,-1130
+h4d5 trained on all,-2110
+pesq noisy,-4034

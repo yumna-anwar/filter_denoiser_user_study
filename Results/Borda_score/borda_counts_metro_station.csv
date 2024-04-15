@@ -1,0 +1,12 @@
+Model,Borda_Count
+h24d5 transfer on metro_station,2554
+h48d5 transfer on metro_station,2182
+h12d5 transfer on metro_station,1886
+h48d5 trained on all,1724
+h24d5 trained on all,820
+h8d5 transfer on metro_station,372
+h8d5 trained on all,-648
+h12d5 trained on all,-1036
+h4d5 transfer on metro_station,-1468
+h4d5 trained on all,-2302
+pesq noisy,-4084

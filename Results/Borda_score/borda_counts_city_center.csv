@@ -1,0 +1,12 @@
+Model,Borda_Count
+h48d5 transfer on city_center,2658
+h12d5 transfer on city_center,2218
+h24d5 transfer on city_center,1996
+h48d5 trained on all,1706
+h8d5 transfer on city_center,1064
+h24d5 trained on all,648
+h8d5 trained on all,-1020
+h4d5 transfer on city_center,-1170
+h12d5 trained on all,-1352
+h4d5 trained on all,-2604
+pesq noisy,-4144

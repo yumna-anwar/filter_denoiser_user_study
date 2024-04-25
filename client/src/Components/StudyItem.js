@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Play from "../Assests/Images/play.svg";
 import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
+import styles from '../Components/study.module.css';
 
 const StudyItem = ({ data, onClickSubmitAnswer }) => {
   const audioRef = useRef(null);
@@ -33,7 +34,12 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
   }, []);
 
   const handleAudioEnded = () => {
-    setShowRating(true);
+    if (!showRating) {
+    setShowRating(true); // Show the rating only after the first playback
+  }
+  if (audioRef.current) {
+    audioRef.current.play(); // Loop the audio
+  }
   };
 
   const handlePlayAudio = () => {
@@ -91,141 +97,44 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
         <source src={data?.path} type="audio/wav" />
         Your browser does not support the audio element.
       </audio>
+
       {showRating && (
-        <div className="mb-3 mt-3">
-          <p className="text-center w-100">Please rate the audio</p>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio1"
-              checked={rate === 1}
-              onChange={() => setRate(1)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio1">
-              1
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio2"
-              checked={rate === 2}
-              onChange={() => setRate(2)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio2">
-              2
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio3"
-              checked={rate === 3}
-              onChange={() => setRate(3)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio3">
-              3
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio4"
-              checked={rate === 4}
-              onChange={() => setRate(4)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio4">
-              4
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio5"
-              checked={rate === 5}
-              onChange={() => setRate(5)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio5">
-              5
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio6"
-              checked={rate === 6}
-              onChange={() => setRate(6)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio6">
-              6
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio7"
-              checked={rate === 7}
-              onChange={() => setRate(7)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio7">
-              7
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio8"
-              checked={rate === 8}
-              onChange={() => setRate(8)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio8">
-              8
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio9"
-              checked={rate === 9}
-              onChange={() => setRate(9)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio9">
-              9
-            </label>
-          </div>
-          <div className="form-check form-check-inline pe-2">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="inlineRadioOptions"
-              id="inlineRadio10"
-              checked={rate === 10}
-              onChange={() => setRate(10)}
-            />
-            <label className="form-check-label ps-1 bold" for="inlineRadio10">
-              10
-            </label>
-          </div>
-        </div>
-      )}
+            <div className="mb-3 mt-3">
+              <p className="text-center w-100">Please rate the audio</p>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                flexWrap: 'wrap'  // Change this from 'nowrap' to 'wrap' to handle responsiveness
+              }}>
+                {[...Array(10)].map((_, index) => (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',  // Corrected from 'alignitems' to 'alignItems'
+                    marginRight: '40px',   // Corrected from 'marginright' to 'marginRight'
+                    marginBottom: '10px'   // Add some bottom margin for better spacing
+                  }} key={index}>
+                    <label htmlFor={`inlineRadio${index + 1}`} style={{
+                      textAlign: 'center',  // Ensure the text is centered over the input
+                      marginBottom: '4px'   // Add some space between the label and the radio button
+                    }}>
+                      {index + 1}
+                    </label>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="inlineRadioOptions"
+                      id={`inlineRadio${index + 1}`}
+                      checked={rate === index + 1}
+                      onChange={() => setRate(index + 1)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
       <button
         disabled={rate === 0}
         className="button btn btn-lg btn-success mt-3"

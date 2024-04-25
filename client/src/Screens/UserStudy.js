@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import styles from '../Components/FilterCentering.module.css';
 import { useParams } from 'react-router-dom';
+import seedrandom from 'seedrandom';
 
 const UserStudy = () => {
   const { participantId } = useParams();
@@ -15,17 +16,30 @@ const UserStudy = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userStudyGuid, setUserStudyGuid] = useState(uuidv4());
 
+
+  function shuffleArray(array, seed) {
+  const rng = seedrandom(seed); // Creates a new random number generator with a seed
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1)); // Use rng instead of Math.random()
+    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+  }
+  }
+
   const loadFiles = async () => {
     const response = await CommonService.GetAllFilesUser(participantId);
     //const response = await CommonService.GetAllFiles(participantId);
     if (response.success) {
-      setFileData(response.fileData);
+      // FOR RANDOMIZATION
+      const shuffledFiles = [...response.fileData];
+      shuffleArray(shuffledFiles, 2); // Use a custom seed
+      setFileData(shuffledFiles);
+      //setFileData(response.fileData);
     }
   };
 
   useEffect(() => {
-    toast.success("Study loaded");
-    toast.success("User: "+participantId);
+    //toast.success("Study loaded");
+    //toast.success("User: "+participantId);
     loadFiles();
   }, []);
 

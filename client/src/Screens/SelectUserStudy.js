@@ -37,10 +37,10 @@ const SelectUserStudy = () => {
   const fetchParticipantIds = async () => {
     try {
       const response = await CommonService.GetAllDirectories();
-      toast.success("Fetching all directories");
+      //toast.success("Fetching all directories");
       if (response.success) {
         const ids = response.directories;//Object.values(data).map(user => user.participantID);
-        toast.error(ids);
+
         setParticipantIds(ids);
       } else {
         toast.error("Error in fetching user directories");

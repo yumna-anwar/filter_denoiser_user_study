@@ -9,9 +9,11 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
   const [rate, setRate] = useState(0);
   const [showRating, setShowRating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
   const handleAudioPlay = () => {
     setIsPlaying(true);
+    setStartTime(Date.now());
   };
 
   const handleAudioPause = () => {
@@ -57,7 +59,9 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
   const handleSubmitAnswer = () => {
     setShowRating(false);
     if (onClickSubmitAnswer) {
-      onClickSubmitAnswer({ rate: rate, fileName: data?.file });
+      const endTime = Date.now();
+      const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+      onClickSubmitAnswer({ rate: rate, fileName: data?.file, timeTaken: timeTaken });
     }
     setRate(0);
   };

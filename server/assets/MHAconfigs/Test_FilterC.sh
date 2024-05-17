@@ -8,10 +8,7 @@ echo "Source file: $1"
 echo "dest file: $2"
 echo "Gain Table: $3"
 
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-
 FILTERA_CFG="$SCRIPT_DIR/FilterC.cfg"
 
 

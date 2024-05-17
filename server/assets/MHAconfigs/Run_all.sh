@@ -24,7 +24,14 @@ mkdir -p "$2"
 # APPLY USER GAIN
 for file in "$1"/*.wav
 do
+	common_part=$(basename "$file" | cut -d'_' -f3-)
+	common_part=$(basename "$common_part" | sed 's/_denoised.wav//')
+	echo $common_part
+
+	file2="$1_noisy/${common_part}_noisy.wav"
+	echo $file2
 	echo $file
+
 	fnameout_HApath1="$2/HApath1_$(basename "$file")"
 	fnameout_HApath2="$2/HApath2_$(basename "$file")"
 	fnameout_Directpath1="$2/Directpath1_$(basename "$file")"
@@ -37,7 +44,7 @@ do
 	mha ?read:$USERGAIN_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$3" io.in="$file" io.out="$fnameout_HApath1" cmd=start cmd=quit
 	mha ?read:$FILTERB_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$5" io.in="$fnameout_HApath1" io.out="$fnameout_HApath2" cmd=start cmd=quit
 
-	mha ?read:$FILTERA_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$4" io.in="$file" io.out="$fnameout_Directpath1" cmd=start cmd=quit
+	mha ?read:$FILTERA_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$4" io.in="$file2" io.out="$fnameout_Directpath1" cmd=start cmd=quit
 	mha ?read:$FILTERC_CFG mha.overlapadd.smoothgains_bridge.mhachain.dc.gtdata="$6" io.in="$fnameout_Directpath1" io.out="$fnameout_Directpath2" cmd=start cmd=quit
 	python assets/MHAconfigs/add_latency.py $fnameout_HApath2 $fnameout_Directpath2 $fnameout_Combinedpath $7
 done

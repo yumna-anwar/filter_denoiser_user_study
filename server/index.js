@@ -267,7 +267,7 @@ app.get("/api/list-directories", (req, res) => {
 
 
 app.post("/api/add-user-study", (req, res) => {
-  const { UserId, FileName, Rate, Guid } = req.body;
+  const { UserId, FileName, Rate, TimeTaken, Guid } = req.body;
 
   if (!UserId || !FileName || !Rate || !Guid) {
     return res.status(200).json({
@@ -286,7 +286,7 @@ app.post("/api/add-user-study", (req, res) => {
   }
 
   let statement = db.prepare(
-    "INSERT INTO UserStudies (UserId, FileName, Rate, Guid, CreatedOn) VALUES (?, ?, ?, ?, ?);"
+    "INSERT INTO UserStudies (UserId, FileName, Rate, Guid, CreatedOn, timetaken) VALUES (?, ?, ?, ?, ?, ?);"
   );
 
   let info = statement.run([
@@ -295,6 +295,7 @@ app.post("/api/add-user-study", (req, res) => {
     Rate,
     Guid,
     new Date().toISOString(),
+    TimeTaken
   ]);
 
   if (info) {

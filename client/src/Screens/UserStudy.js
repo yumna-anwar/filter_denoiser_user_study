@@ -48,11 +48,11 @@ const UserStudy = () => {
       UserId: userId,
       FileName: data.fileName,
       Rate: data.rate,
+      TimeTaken: data.timeTaken,
       Guid: userStudyGuid,
     };
     var response = await CommonService.AddUserStudy(payload);
     if (response.success) {
-      toast.success(response.message);
       if (currentIndex < fileData.length - 1) {
         setCurrentIndex(currentIndex + 1);
       }

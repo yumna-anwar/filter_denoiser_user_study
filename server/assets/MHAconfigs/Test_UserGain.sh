@@ -1,7 +1,8 @@
 #!/bin/bash
-export MHA_LIBRARY_PATH=../../../openMHA-master/lib
-export PATH=../../../openMHA-master/bin:$PATH
-source ../../../openMHA-master/bin/thismha.sh
+export MHA_LIBRARY_PATH=/Users/yumnaanwar/Desktop/Audio_Denoiser/openMHA-master/lib
+export PATH=/Users/yumnaanwar/Desktop/Audio_Denoiser/openMHA-master/bin:$PATH
+source /Users/yumnaanwar/Desktop/Audio_Denoiser/openMHA-master/bin/thismha.sh
+
 
 
 echo "Source file: $1"

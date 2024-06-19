@@ -34,6 +34,10 @@ app.use(
   "/assets/stimulisentences_usertest",
   express.static(path.join(__dirname, "assets/stimulisentences_usertest"))
 );
+app.use(
+  "/assets/stimulisentences_pairwise",
+  express.static(path.join(__dirname, "assets/stimulisentences_pairwise"))
+);
 
 app.get("/api/get-all-user", (req, res) => {
   const query = db.prepare("SELECT * FROM users");
@@ -250,6 +254,63 @@ app.get("/api/list-files-userid/:id", (req, res) => {
     }
   });
 });
+app.get("/api/list-files-pairwise", (req, res) => {
+  const basePath = path.join(__dirname, 'assets/stimulisentences_pairwise/');
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const folders = ["mod1", "mod2", "mod3", "mod4", "mod5","mod6"];
+    let filesByFolder = [];
+    let promises = [];
+
+    folders.forEach(folder => {
+      const folderPath = path.join(basePath, folder);
+      // Reading each folder and pushing the promise into an array
+      promises.push(
+        fs.promises.readdir(folderPath).then(files => {
+          // Filter and map the files to include the full path and folder name
+          return files.filter(file => file.endsWith('.wav')).map(file => ({
+            name: file,
+            path: `${baseUrl}/assets/stimulisentences_pairwise/${folder}/${file}`,
+            folder: folder
+          }));
+        }).catch(err => {
+          console.error(`Error reading files from folder: ${folder}`, err);
+          return []; // Return an empty array in case of error to keep the structure
+        })
+      );
+    });
+
+    // Resolve all promises and process files pairwise
+    Promise.all(promises).then(filesByFolder => {
+      let filePairs = [];
+      const baseFolderFiles = filesByFolder[0]; // Assuming the first folder is the base for comparison
+
+      // Generate all combinations of folder pairs
+    for (let i = 0; i < filesByFolder.length; i++) {
+      for (let j = i + 1; j < filesByFolder.length; j++) {
+        filesByFolder[i].forEach(file1 => {
+          const matchFile = filesByFolder[j].find(file2 => file2.name === file1.name);
+          if (matchFile) {
+            filePairs.push({
+              path1: file1.path,
+              path2: matchFile.path,
+              name1: file1.folder,
+              name2: matchFile.folder,
+              fileName: file1.name
+            });
+          }
+        });
+      }
+    }
+
+      // Send the response with the pairs
+      console.log(filePairs);
+      res.json({ success: true, message: "File pairs fetched successfully", filePairs: filePairs });
+    }).catch(error => {
+      console.error("Failed to read files pairwise", error);
+      res.status(500).json({ success: false, message: "Failed to read files pairwise" });
+    });
+
+  });
 
 app.get("/api/list-directories", (req, res) => {
   const basePath = path.join(__dirname, `assets/stimulisentences_usertest/`); // Adjust path as needed
@@ -296,6 +357,50 @@ app.post("/api/add-user-study", (req, res) => {
     Guid,
     new Date().toISOString(),
     TimeTaken
+  ]);
+
+  if (info) {
+    return res.status(200).json({ success: true, message: "Answer Submitted" });
+  }
+  return res.status(200).json({ success: false, message: "Answer Not Submit" });
+});
+
+app.post("/api/add-user-study-pairwise", (req, res) => {
+  const { UserId, FileName1,FileName2, Rate, TimeTaken, ReasonslessAnnoying, ReasonslessEffortful, ReasonsmoreNatural, ReasonsbetterQuality, Guid } = req.body;
+
+  if (!UserId || !FileName1 || !FileName2 || !Rate || !Guid) {
+    return res.status(200).json({
+      success: false,
+      message: "Missing or invalid data in the request.",
+    });
+  }
+
+  const checkUser = db.prepare(
+    "SELECT COUNT(*) as count FROM users WHERE Id = ?"
+  );
+  const existingUser = checkUser.get(UserId);
+  console.log(existingUser);
+  if (existingUser.count === 0) {
+    return res.status(200).json({ success: false, message: "User Not Found." });
+  }
+
+  let statement = db.prepare(
+    "INSERT INTO UserStudiesPair (UserId, FileName1,FileName2, Rate, Guid, CreatedOn, timetaken, lessAnnoying, lessEffortful, moreNatural, betterQuality) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+  );
+
+  let info = statement.run([
+    UserId,
+    FileName1,
+    FileName2,
+    Rate,
+    Guid,
+    new Date().toISOString(),
+    TimeTaken,
+    ReasonslessAnnoying,
+    ReasonslessEffortful,
+    ReasonsmoreNatural,
+    ReasonsbetterQuality
+
   ]);
 
   if (info) {
@@ -822,44 +927,6 @@ async function runScript(scriptPath, sourcePath, destPath, param) {
     throw new Error('Script execution failed');
   }
 }
-
-// app.post('/api/run-userGain-test', (req, res) => {
-//   const baseUrl = `${req.protocol}://${req.get("host")}`;
-//   const {mhagainparam, filterAparam, filterBparam, filterCparam} = req.body;
-//
-//   const scriptPath = path.join(__dirname, "/assets/MHAconfigs/Test_UserGain.sh");
-//   const scriptPath_filterA = path.join(__dirname, "/assets/MHAconfigs/Test_FilterA.sh");
-//   const scriptPath_filterB = path.join(__dirname, "/assets/MHAconfigs/Test_FilterB.sh");
-//   const scriptPath_filterC = path.join(__dirname, "/assets/MHAconfigs/Test_FilterC.sh");
-//
-//   const sourceAudioPath = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-//   const destAudioPath = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_HApath.wav");
-//
-//   const sourceAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/stereo_ISTS.wav");
-//   const destAudioPath_DIRECT = path.join(__dirname, "/assets/test_sentence/usergain-test/stereo_ISTS_Directpath.wav");
-//
-//   if (!mhagainparam || typeof mhagainparam !== 'string') {
-//     return res.status(400).send({ message: 'Invalid parameter' });
-//   }
-//   const mhagainparamWithQuotes = `'${mhagainparam}'`;
-//   const filterAparamWithQuotes = `'${filterAparam}'`;
-//   const filterBparamWithQuotes = `'${filterBparam}'`;
-//   const filterCparamWithQuotes = `'${filterCparam}'`;
-//   try {
-//     // HEARING AID PATH
-//     await runScript(scriptPath, sourceAudioPath, destAudioPath, mhagainparamWithQuotes);
-//     await runScript(scriptPath_filterB, destAudioPath, destAudioPath, filterBparamWithQuotes);
-//     // DIRECT path
-//     await runScript(scriptPath_filterA, sourceAudioPath_DIRECT, destAudioPath_DIRECT, filterAparamWithQuotes);
-//     await runScript(scriptPath_filterC, destAudioPath_DIRECT, destAudioPath_DIRECT, filterCparamWithQuotes);
-//     res.send({ success: true, message: 'Scripts executed successfully' });
-//   } catch (error) {
-//     res.status(500).send({ success: false, message: error.message });
-//   }
-//
-// });
-
-
 
 app.get("/api/get-all-user-study", (req, res) => {
   const query = db.prepare(

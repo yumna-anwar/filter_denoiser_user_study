@@ -3,7 +3,7 @@ import Play from "../Assests/Images/play.svg";
 import Pause from "../Assests/Images/pause.svg";
 import Reload from "../Assests/Images/reload.svg";
 import styles from '../Components/study.module.css';
-
+import { toast } from "react-toastify";
 const StudyItem = ({ data, onClickSubmitAnswer }) => {
   const audioRef = useRef(null);
   const [rate, setRate] = useState(0);
@@ -67,6 +67,7 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
   };
 
   useEffect(() => {
+    toast.error(data?.path);
     if (audioRef.current) {
       audioRef.current.src = data?.path;
       setTimeout(() => {

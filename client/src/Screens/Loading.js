@@ -10,6 +10,8 @@ import UserGains from "./Admin.UserGain";
 import Dashboard from "./Dashboard";
 import UserStudy from "./UserStudy";
 import SelectUserStudy from "./SelectUserStudy";
+import UserStudyPairwise from "./UserStudyPairwise";
+import UserStudyPairwiseDemo from "./UserStudyPairwiseDemo";
 import UserConfig from "./UserConfig";
 import VentConfig from "./VentConfig";
 import InlossConfig from "./InlossConfig";
@@ -59,17 +61,22 @@ const Loading = () => {
           ) : (
             <>
               <Route exact path="/" element={<Dashboard />} />
-              <Route exact path="/user-config" element={<UserConfig />} />
-              <Route exact path="/filter-config" element={<FilterConfig />} />
-              <Route exact path="/vent-config" element={<VentConfig />} />
-              <Route exact path="/inloss-config" element={<InlossConfig />} />
-              <Route exact path="/user-study/:participantId" element={<UserStudy />} />
-              <Route exact path="/select-user-study" element={<SelectUserStudy />} />
-              <Route exact path="/pinna-config" element={<PinnaConfig />} />
-              <Route exact path="/ha-fitting" element={<HAcalib />} />
-              <Route exact path="/gen-audio" element={<GenerateAudio />} />
+
+              <Route exact path="/user-study-pairwise" element={<UserStudyPairwise />} />
+              <Route exact path="/user-study-pairwise-demo" element={<UserStudyPairwiseDemo />} />
+
               {isAdmin === true && (
                 <>
+                <Route exact path="/user-config" element={<UserConfig />} />
+                <Route exact path="/filter-config" element={<FilterConfig />} />
+                <Route exact path="/vent-config" element={<VentConfig />} />
+                <Route exact path="/inloss-config" element={<InlossConfig />} />
+                <Route exact path="/user-study/:participantId" element={<UserStudy />} />
+                <Route exact path="/select-user-study" element={<SelectUserStudy />} />
+                <Route exact path="/pinna-config" element={<PinnaConfig />} />
+                <Route exact path="/ha-fitting" element={<HAcalib />} />
+                <Route exact path="/gen-audio" element={<GenerateAudio />} />
+
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin/user-studies" element={<UserStudies />} />
                   <Route path="/admin/filter-A" element={<FiltersA />} />

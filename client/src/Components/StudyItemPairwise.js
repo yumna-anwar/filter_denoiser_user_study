@@ -21,6 +21,11 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
   const [startTime, setStartTime] = useState(null);
   const [bothPlayed, setBothPlayed] = useState({ audio1: false, audio2: false });
 
+  const [audioPaths, setAudioPaths] = useState({
+  path1: data?.path1,
+  path2: data?.path2
+  });
+
   // Calculate if all reasons have been addressed
   const allReasonsAddressed = Object.values(reasons).every(value => value === 'yes' || value === 'no');
 
@@ -43,18 +48,35 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
     backgroundColor: '#007bff', // Blue background for normal state
     color: 'white'
   };
+  // Simple function to randomly shuffle two items
+  const getRandomOrder = () => Math.random() > 0.5 ? [data.path1, data.path2] : [data.path2, data.path1];
 
-  useEffect(() => {
-    // Set the source only if it's not already set or has changed
-    if (audioRef1.current && data?.path1 && audioRef1.current.src !== data?.path1) {
-        audioRef1.current.src = data.path1;
-        audioRef1.current.load(); // Ensure to load the new source
-    }
-    if (audioRef2.current && data?.path2 && audioRef2.current.src !== data?.path2) {
-        audioRef2.current.src = data.path2;
-        audioRef2.current.load(); // Same as above
-    }
-}, [data?.path1, data?.path2]); // Depend on data paths to update sources
+//   useEffect(() => {
+//     // Set the source only if it's not already set or has changed
+//     if (audioRef1.current && data?.path1 && audioRef1.current.src !== data?.path1) {
+//         audioRef1.current.src = data.path1;
+//         audioRef1.current.load(); // Ensure to load the new source
+//     }
+//     if (audioRef2.current && data?.path2 && audioRef2.current.src !== data?.path2) {
+//         audioRef2.current.src = data.path2;
+//         audioRef2.current.load(); // Same as above
+//     }
+// }, [data?.path1, data?.path2]); // Depend on data paths to update sources
+
+    useEffect(() => {
+      const [firstPath, secondPath] = getRandomOrder(); // Get paths in random order
+      setAudioPaths({ path1: firstPath, path2: secondPath }); // Update state with shuffled paths
+
+      if (audioRef1.current && firstPath && audioRef1.current.src !== firstPath) {
+          audioRef1.current.src = firstPath;
+          audioRef1.current.load(); // Ensure to load the new source
+      }
+      if (audioRef2.current && secondPath && audioRef2.current.src !== secondPath) {
+          audioRef2.current.src = secondPath;
+          audioRef2.current.load(); // Same as above
+      }
+    }, [data?.path1, data?.path2]); // Depend on data paths to update sources
+
 
     const handleAudioEnded1 = () => {
       setShowRating(false); // Set to false if you want the rating to appear only after both audios have played
@@ -96,16 +118,34 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
 
   };
 
-  const handleSubmitAnswer = () => {
-    setShowRating(false);
-    if (onClickSubmitAnswer) {
-      const endTime = Date.now();
-      const timeTaken = (endTime - startTime) / 1000; // Time in seconds
-      onClickSubmitAnswer({ rate: rate, fileName1: data.path1, fileName2: data.path2, timeTaken: timeTaken, reasons: reasons });
-    }
-    setRate('None');  // Reset the rating after submitting
-    setBothPlayed({ audio1: false, audio2: false });
+  // const handleSubmitAnswer = () => {
+  //   setShowRating(false);
+  //   if (onClickSubmitAnswer) {
+  //     const endTime = Date.now();
+  //     const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+  //     onClickSubmitAnswer({ rate: rate, fileName1: data.path1, fileName2: data.path2, timeTaken: timeTaken, reasons: reasons });
+  //   }
+  //   setRate('None');  // Reset the rating after submitting
+  //   setBothPlayed({ audio1: false, audio2: false });
+  // };
+
+    const handleSubmitAnswer = () => {
+      setShowRating(false);
+      if (onClickSubmitAnswer) {
+        const endTime = Date.now();
+        const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+        onClickSubmitAnswer({
+          rate: rate,
+          fileName1: audioPaths.path1, // Reflects the current path associated with audioRef1
+          fileName2: audioPaths.path2, // Reflects the current path associated with audioRef2
+          timeTaken: timeTaken,
+          reasons: reasons
+        });
+      }
+      setRate('None');  // Reset the rating after submitting
+      setBothPlayed({ audio1: false, audio2: false });
   };
+
 
   const handleRateChange = (newRate) => {
     setRate(newRate);

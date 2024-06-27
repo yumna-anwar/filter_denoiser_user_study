@@ -48,8 +48,14 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
     backgroundColor: '#007bff', // Blue background for normal state
     color: 'white'
   };
-  // Simple function to randomly shuffle two items
-  const getRandomOrder = () => Math.random() > 0.5 ? [data.path1, data.path2] : [data.path2, data.path1];
+
+  const getRandomOrder = () => {
+  if (!data?.path1 || !data?.path2) {
+    return [null, null];  // Return null paths if data is not ready
+  }
+  return Math.random() > 0.5 ? [data.path1, data.path2] : [data.path2, data.path1];
+};
+
 
 //   useEffect(() => {
 //     // Set the source only if it's not already set or has changed

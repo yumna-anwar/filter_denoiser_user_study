@@ -183,55 +183,59 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
 
   return (
     <div className="study-items d-flex flex-column align-items-center justify-content-center py-3">
-  <div className="d-flex justify-content-around w-100" style={{ marginBottom: '20px' }}>
-    <div style={{ marginRight: '10px', textAlign: 'center' }}>
-      <button onClick={() => handlePlayPause(audioRef1, isPlaying1, setIsPlaying1)}
-              style={isPlaying1 ? activeButtonStyle : normalButtonStyle}
-              className="button btn btn-sm play mb-3">
-        <img src={isPlaying1 ? Pause : Play} alt="Play/Pause" />
-      </button>
-      <audio ref={audioRef1} onEnded={handleAudioEnded1}>
-        <source src={data?.path1} type="audio/wav" />
-        Your browser does not support the audio element.
-      </audio>
+    <div className="d-flex justify-content-around w-100" style={{ marginBottom: '20px' }}>
+      {/* Shaded box for Audio A */}
+      <div style={{ marginRight: '10px', textAlign: 'center', backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '8px' }}>
+        <div className="audio-title" style={{ textAlign: 'center', fontSize: '1.2rem' }}>Audio A</div>  {/* Title for Audio A */}
+        <button onClick={() => handlePlayPause(audioRef1, isPlaying1, setIsPlaying1)}
+                style={isPlaying1 ? activeButtonStyle : normalButtonStyle}
+                className="button btn btn-sm play mb-3">
+          <img src={isPlaying1 ? Pause : Play} alt="Play/Pause" />
+        </button>
+        <audio ref={audioRef1} onEnded={handleAudioEnded1}>
+          <source src={data?.path1} type="audio/wav" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      {/* Shaded box for Audio B */}
+      <div style={{ marginLeft: '10px', textAlign: 'center', backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '8px' }}>
+        <div className="audio-title" style={{ textAlign: 'center', fontSize: '1.2rem' }}>Audio B</div>  {/* Title for Audio B */}
+        <button onClick={() => handlePlayPause(audioRef2, isPlaying2, setIsPlaying2)}
+                style={isPlaying2 ? activeButtonStyle : normalButtonStyle}
+                className="button btn btn-sm play mb-3">
+          <img src={isPlaying2 ? Pause : Play} alt="Play/Pause" />
+        </button>
+        <audio ref={audioRef2} onEnded={handleAudioEnded2}>
+          <source src={data?.path2} type="audio/wav" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
     </div>
-    <div style={{ marginLeft: '10px', textAlign: 'center' }}>
-      <button onClick={() => handlePlayPause(audioRef2, isPlaying2, setIsPlaying2)}
-              style={isPlaying2 ? activeButtonStyle : normalButtonStyle}
-              className="button btn btn-sm play mb-3">
-        <img src={isPlaying2 ? Pause : Play} alt="Play/Pause" />
-      </button>
-      <audio ref={audioRef2} onEnded={handleAudioEnded2}>
-        <source src={data?.path2} type="audio/wav" />
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-  </div>
 
-        {showRating && (
-          <div className="mt-3" style={{ textAlign: 'center' }}>
-            <p>Which one do you prefer?</p>
-            <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}>
-              <button style={{ border: '1px solid #007bff', padding: '0.25rem 0.5rem', margin: '0 10px',fontSize: '1rem', fontWeight: 'bold', borderRadius: '5px' }}
-                      className={`btn btn-sm ${rate === 'A' ? 'btn-primary' : 'btn-outline-primary'}`}
-                      onClick={() => handleRateChange('A')}>
-                Audio A
-              </button>
-              <button style={{ border: '1px solid #007bff', padding: '0.25rem 0.5rem', margin: '0 10px',fontSize: '1rem', fontWeight: 'bold', borderRadius: '5px' }}
-                      className={`btn btn-sm ${rate === 'B' ? 'btn-primary' : 'btn-outline-primary'}`}
-                      onClick={() => handleRateChange('B')}>
-                Audio B
-              </button>
-            </div>
-          </div>
-        )}
+    {showRating && (
+      <div className="mt-3" style={{ textAlign: 'center', fontSize: '1.2rem' }}>
+        <p>Which one do you prefer?</p>
+        <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}>
+          <button style={{ border: '1px solid #007bff', padding: '0.25rem 0.5rem', margin: '0 10px', fontSize: '2rem', fontWeight: 'bold', borderRadius: '5px' }}
+                  className={`btn btn-sm ${rate === 'A' ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => handleRateChange('A')}>
+            Audio A
+          </button>
+          <button style={{ border: '1px solid #007bff', padding: '0.25rem 0.5rem', margin: '0 10px', fontSize: '2rem', fontWeight: 'bold', borderRadius: '5px' }}
+                  className={`btn btn-sm ${rate === 'B' ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => handleRateChange('B')}>
+            Audio B
+          </button>
+        </div>
+      </div>
+    )}
 
         {(rate === 'A' || rate === 'B') && (
-          <div className="mt-3" style={{ marginTop: '20px' }}>
+          <div className="mt-3" style={{ marginTop: '20px' , fontSize: '1.2rem' }}>
             <p>I prefer {rate} because…</p>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ marginRight: '80px' }}>The noise is less annoying: </span>
+                <span style={{ marginRight: '95px' }}>The noise is less annoying: </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
@@ -244,7 +248,7 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ marginRight: '62px' }}>The listening is less effortful:</span>
+                <span style={{ marginRight: '75px' }}>The listening is less effortful:</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
@@ -257,7 +261,7 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ marginRight: '80px' }}>The sound is more natural:</span>
+                <span style={{ marginRight: '95px' }}>The sound is more natural:</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
@@ -270,7 +274,7 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ marginRight: '20px' }}>The overall sound quality is better:</span>
+                <span style={{ marginRight: '25px' }}>The overall sound quality is better:</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
@@ -290,7 +294,8 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
 
         <button disabled={!allReasonsAddressed || rate === 'None'} // Ensures both a selection and reasons are provided
                 className="btn btn-lg btn-success mt-3"
-                onClick={handleSubmitAnswer}>
+                onClick={handleSubmitAnswer}
+                style={{fontSize: '2rem'}}>
           Submit Answer
         </button>
       </div>

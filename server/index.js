@@ -257,7 +257,7 @@ app.get("/api/list-files-userid/:id", (req, res) => {
 app.get("/api/list-files-pairwise", (req, res) => {
   const basePath = path.join(__dirname, 'assets/stimulisentences_pairwise/');
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const folders = ["mod1", "mod2", "mod3", "mod4", "mod5","mod6"];
+    const folders = ["mod1_h8all", "mod2_h8one", "mod3_h24all", "mod4_h24one", "mod5_mmse","mod6_noisy"];
     let filesByFolder = [];
     let promises = [];
 

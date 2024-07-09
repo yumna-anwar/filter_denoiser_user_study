@@ -12,6 +12,8 @@ import UserStudy from "./UserStudy";
 import SelectUserStudy from "./SelectUserStudy";
 import UserStudyPairwise from "./UserStudyPairwise";
 import UserStudyPairwiseDemo from "./UserStudyPairwiseDemo";
+import SoundCalibration from "./SoundCalibration";
+
 import UserConfig from "./UserConfig";
 import VentConfig from "./VentConfig";
 import InlossConfig from "./InlossConfig";
@@ -61,7 +63,7 @@ const Loading = () => {
           ) : (
             <>
               <Route exact path="/" element={<Dashboard />} />
-
+              <Route exact path="/sound-calibration" element={<SoundCalibration />} />
               <Route exact path="/user-study-pairwise" element={<UserStudyPairwise />} />
               <Route exact path="/user-study-pairwise-demo" element={<UserStudyPairwiseDemo />} />
 

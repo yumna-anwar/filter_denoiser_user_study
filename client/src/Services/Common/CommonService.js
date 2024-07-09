@@ -65,6 +65,9 @@ const GetAllDirectories = (payload) => {
   return RestClient.Get(`http://localhost:3001/api/list-directories`);
 };
 
+
+
+
 const Login = (payload) => {
   return RestClient.Post(`http://localhost:3001/api/login`, payload);
 };
@@ -128,7 +131,7 @@ const exportedObject = {
   AddUserStudyPairwise,
   GetAllUserStudy,
   GetAllUsers,
-  GetUserById,
+  GetUserById
 };
 
 export default exportedObject;

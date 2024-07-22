@@ -11,10 +11,10 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
   const [rate, setRate] = useState('None');
   const [showRating, setShowRating] = useState(false);
   const [reasons, setReasons] = useState({
-    lessAnnoying: false,
-    lessEffortful: false,
-    moreNatural: false,
-    betterQuality: false
+    lessAnnoying: 'no',
+    lessEffortful: 'no',
+    moreNatural: 'no',
+    betterQuality: 'no'
   });
   const [isPlaying1, setIsPlaying1] = useState(false);
   const [isPlaying2, setIsPlaying2] = useState(false);
@@ -159,10 +159,10 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
     setRate(newRate);
     // Reset reasons whenever a new rate is selected
     setReasons({
-      lessAnnoying: false,
-      lessEffortful: false,
-      moreNatural: false,
-      betterQuality: false
+      lessAnnoying: 'no',
+      lessEffortful: 'no',
+      moreNatural: 'no',
+      betterQuality: 'no'
     });
 
   };
@@ -241,11 +241,11 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
-                    <input type="radio" name="lessAnnoying" value="yes" checked={reasons.lessAnnoying === 'yes'} onChange={() => handleReasonChange('lessAnnoying', 'yes')} />
+                    <input type="radio" name="lessAnnoying" value="yes" checked={reasons.lessAnnoying === 'yes'} onChange={() => handleReasonChange('lessAnnoying', 'yes')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'red' }}>No</span>
-                    <input type="radio" name="lessAnnoying" value="no" checked={reasons.lessAnnoying === 'no'} onChange={() => handleReasonChange('lessAnnoying', 'no')} />
+                    <input type="radio" name="lessAnnoying" value="no" checked={reasons.lessAnnoying === 'no'} onChange={() => handleReasonChange('lessAnnoying', 'no')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                 </div>
               </div>
@@ -254,11 +254,11 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
-                    <input type="radio" name="lessEffortful" value="yes" checked={reasons.lessEffortful === 'yes'} onChange={() => handleReasonChange('lessEffortful', 'yes')} />
+                    <input type="radio" name="lessEffortful" value="yes" checked={reasons.lessEffortful === 'yes'} onChange={() => handleReasonChange('lessEffortful', 'yes')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'red' }}>No</span>
-                    <input type="radio" name="lessEffortful" value="no" checked={reasons.lessEffortful === 'no'} onChange={() => handleReasonChange('lessEffortful', 'no')} />
+                    <input type="radio" name="lessEffortful" value="no" checked={reasons.lessEffortful === 'no'} onChange={() => handleReasonChange('lessEffortful', 'no')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                 </div>
               </div>
@@ -267,11 +267,11 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
-                    <input type="radio" name="moreNatural" value="yes" checked={reasons.moreNatural === 'yes'} onChange={() => handleReasonChange('moreNatural', 'yes')} />
+                    <input type="radio" name="moreNatural" value="yes" checked={reasons.moreNatural === 'yes'} onChange={() => handleReasonChange('moreNatural', 'yes')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'red' }}>No</span>
-                    <input type="radio" name="moreNatural" value="no" checked={reasons.moreNatural === 'no'} onChange={() => handleReasonChange('moreNatural', 'no')} />
+                    <input type="radio" name="moreNatural" value="no" checked={reasons.moreNatural === 'no'} onChange={() => handleReasonChange('moreNatural', 'no')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                 </div>
               </div>
@@ -280,11 +280,11 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'green' }}>Yes</span>
-                    <input type="radio" name="betterQuality" value="yes" checked={reasons.betterQuality === 'yes'} onChange={() => handleReasonChange('betterQuality', 'yes')} />
+                    <input type="radio" name="betterQuality" value="yes" checked={reasons.betterQuality === 'yes'} onChange={() => handleReasonChange('betterQuality', 'yes')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ color: 'red' }}>No</span>
-                    <input type="radio" name="betterQuality" value="no" checked={reasons.betterQuality === 'no'} onChange={() => handleReasonChange('betterQuality', 'no')} />
+                    <input type="radio" name="betterQuality" value="no" checked={reasons.betterQuality === 'no'} onChange={() => handleReasonChange('betterQuality', 'no')} style={{ transform: 'scale(2)', margin: '5px' }}/>
                   </div>
                 </div>
               </div>

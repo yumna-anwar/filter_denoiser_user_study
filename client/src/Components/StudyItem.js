@@ -67,7 +67,7 @@ const StudyItem = ({ data, onClickSubmitAnswer }) => {
   };
 
   useEffect(() => {
-    toast.error(data?.path);
+    //toast.error(data?.path);
     if (audioRef.current) {
       audioRef.current.src = data?.path;
       setTimeout(() => {

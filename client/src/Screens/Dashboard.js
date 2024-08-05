@@ -54,7 +54,7 @@ const Dashboard = () => {
             <button
               className="button btn btn-lg btn-success"
               type="button"
-              onClick={() => navigate("user-study-pairwise-demo")}
+              onClick={() => navigate("user-study-pairwise-demo-screen")}
               // If you need to include the currentUserId, uncomment the next line
               // onClick={() => navigate(`/user-study-pairwise/${currentUserId}`)}
             >

@@ -71,8 +71,8 @@ const StudyItemPairwise = ({ data, onClickSubmitAnswer }) => {
 
     useEffect(() => {
       const [firstPath, secondPath] = getRandomOrder(); // Get paths in random order
-      //toast.success("A: "+firstPath);
-      //toast.success("B: "+secondPath);
+      toast.success("A: "+firstPath);
+      toast.success("B: "+secondPath);
       setAudioPaths({ path1: firstPath, path2: secondPath }); // Update state with shuffled paths
 
       if (audioRef1.current && firstPath && audioRef1.current.src !== firstPath) {

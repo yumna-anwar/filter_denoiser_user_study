@@ -61,6 +61,9 @@ const GetAllFilesId = (id) => {
 const GetAllFilesPairwise = (id) => {
   return RestClient.Get(`http://localhost:3001/api/list-files-pairwise`);
 };
+const GetAllFilesPairwiseDemo = (id) => {
+  return RestClient.Get(`http://localhost:3001/api/list-files-pairwise-demo`);
+};
 const GetAllDirectories = (payload) => {
   return RestClient.Get(`http://localhost:3001/api/list-directories`);
 };
@@ -126,6 +129,7 @@ const exportedObject = {
   GetAllFilesUser,
   GetAllFiles,
   GetAllFilesPairwise,
+  GetAllFilesPairwiseDemo,
   GetAllDirectories,
   AddUserStudy,
   AddUserStudyPairwise,

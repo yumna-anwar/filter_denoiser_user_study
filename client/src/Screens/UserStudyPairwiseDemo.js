@@ -18,7 +18,7 @@ const UserStudyPairwiseDemo = () => {
 
   const loadFiles = async () => {
         try {
-          const filePairs = await CommonService.GetAllFilesPairwise();
+          const filePairs = await CommonService.GetAllFilesPairwiseDemo();
           if (filePairs.success) {
             // Assuming you want to randomize and then pick the first 5 pairs for demo purposes
             const shuffledPairs = shuffleArray([...filePairs.filePairs]); // Copy and shuffle the original array

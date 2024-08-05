@@ -12,6 +12,7 @@ import UserStudy from "./UserStudy";
 import SelectUserStudy from "./SelectUserStudy";
 import UserStudyPairwise from "./UserStudyPairwise";
 import UserStudyPairwiseDemo from "./UserStudyPairwiseDemo";
+import UserStudyPairwiseDemoScreen from "./UserStudyPairwiseDemoScreen";
 import SoundCalibration from "./SoundCalibration";
 
 import UserConfig from "./UserConfig";
@@ -66,6 +67,7 @@ const Loading = () => {
               <Route exact path="/sound-calibration" element={<SoundCalibration />} />
               <Route exact path="/user-study-pairwise" element={<UserStudyPairwise />} />
               <Route exact path="/user-study-pairwise-demo" element={<UserStudyPairwiseDemo />} />
+              <Route exact path="/user-study-pairwise-demo-screen" element={<UserStudyPairwiseDemoScreen />} />
 
               {isAdmin === true && (
                 <>

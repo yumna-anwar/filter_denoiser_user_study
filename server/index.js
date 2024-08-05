@@ -312,6 +312,64 @@ app.get("/api/list-files-pairwise", (req, res) => {
 
   });
 
+app.get("/api/list-files-pairwise-demo", (req, res) => {
+  const basePath = path.join(__dirname, 'assets/stimulisentences_pairwise/');
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const folders = [ "mod4_h24one", "mod6_noisy"];
+    let filesByFolder = [];
+    let promises = [];
+
+    folders.forEach(folder => {
+      const folderPath = path.join(basePath, folder);
+      // Reading each folder and pushing the promise into an array
+      promises.push(
+        fs.promises.readdir(folderPath).then(files => {
+          // Filter and map the files to include the full path and folder name
+          return files.filter(file => file.endsWith('.wav')).map(file => ({
+            name: file,
+            path: `${baseUrl}/assets/stimulisentences_pairwise/${folder}/${file}`,
+            folder: folder
+          }));
+        }).catch(err => {
+          console.error(`Error reading files from folder: ${folder}`, err);
+          return []; // Return an empty array in case of error to keep the structure
+        })
+      );
+    });
+
+    // Resolve all promises and process files pairwise
+    Promise.all(promises).then(filesByFolder => {
+      let filePairs = [];
+      const baseFolderFiles = filesByFolder[0]; // Assuming the first folder is the base for comparison
+
+      // Generate all combinations of folder pairs
+    for (let i = 0; i < filesByFolder.length; i++) {
+      for (let j = i + 1; j < filesByFolder.length; j++) {
+        filesByFolder[i].forEach(file1 => {
+          const matchFile = filesByFolder[j].find(file2 => file2.name === file1.name);
+          if (matchFile) {
+            filePairs.push({
+              path1: file1.path,
+              path2: matchFile.path,
+              name1: file1.folder,
+              name2: matchFile.folder,
+              fileName: file1.name
+            });
+          }
+        });
+      }
+    }
+
+      // Send the response with the pairs
+      console.log(filePairs);
+      res.json({ success: true, message: "File pairs fetched successfully", filePairs: filePairs });
+    }).catch(error => {
+      console.error("Failed to read files pairwise", error);
+      res.status(500).json({ success: false, message: "Failed to read files pairwise" });
+    });
+
+  });
+
 app.get("/api/list-directories", (req, res) => {
   const basePath = path.join(__dirname, `assets/stimulisentences_usertest/`); // Adjust path as needed
   fs.readdir(basePath, { withFileTypes: true }, (err, entries) => {
